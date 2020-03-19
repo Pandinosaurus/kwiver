@@ -78,6 +78,13 @@ target_link_libraries(python-vital.types-covariance
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(database_query
+  vital/types
+  database_query.cxx)
+target_link_libraries(python-vital.types-database_query
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(descriptor
   vital/types
   descriptor.cxx)
@@ -183,6 +190,13 @@ target_link_libraries(python-vital.types-track_set
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(uid
+  vital/types
+  uid.cxx)
+target_link_libraries(python-vital.types-uid
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(object_track_set
   vital/types
   object_track_set.cxx)
@@ -199,6 +213,7 @@ if(NOT SKBUILD)
     camera_map
     color
     covariance
+    database_query
     descriptor
     descriptor_set
     detected_object_type
@@ -213,6 +228,7 @@ if(NOT SKBUILD)
     timestamp
     track
     track_set
+    uid
     object_track_set
     activity_types
   )

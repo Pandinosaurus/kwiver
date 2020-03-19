@@ -27,6 +27,7 @@ set(__testable_modnames
   test_track
   test_track_set
   test_track_state
+  test_uid
   )
 
 if(KWIVER_ENABLE_SPROKIT AND KWIVER_ENABLE_ARROWS)
