@@ -11,6 +11,7 @@ set(__testable_modnames
   test_camera_map
   test_color
   test_covariance
+  test_database_query
   test_descriptor
   test_descriptor_set
   test_eigen_numpy

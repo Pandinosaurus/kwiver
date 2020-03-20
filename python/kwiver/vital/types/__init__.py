@@ -7,6 +7,7 @@ from kwiver.vital.types.camera_intrinsics import *
 from kwiver.vital.types.camera_map import *
 from kwiver.vital.types.color import *
 from kwiver.vital.types.covariance import *
+from kwiver.vital.types.database_query import *
 from kwiver.vital.types.descriptor import *
 from kwiver.vital.types.descriptor_set import *
 from kwiver.vital.types.detected_object_type import *
