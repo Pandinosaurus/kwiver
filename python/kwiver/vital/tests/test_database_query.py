@@ -143,7 +143,6 @@ class TestVitalDatabaseQuery(object):
 
 
     def test_set_and_get_temporal_filter(self):
-        # TODO: uninitialized?
         dq = self._create_database_query()
         test_filters = [database_query.query_filter.IGNORE_FILTER,
                         database_query.query_filter.CONTAINS_WHOLLY,
@@ -175,7 +174,6 @@ class TestVitalDatabaseQuery(object):
 
 
     def test_set_and_get_spatial_filter(self):
-        # TODO: uninitialized?
         dq = self._create_database_query()
         test_filters = [database_query.query_filter.IGNORE_FILTER,
                         database_query.query_filter.CONTAINS_WHOLLY,
@@ -222,7 +220,9 @@ class TestVitalDatabaseQuery(object):
 
     def test_set_and_get_stream_filter(self):
         dq = self._create_database_query()
-        #TODO: Is this uninitialized? its a string
+        nt.assert_equals(dq.stream_filter, "", "Default stream filter not empty string")
+
+        # Now test setting and getting some values
         test_strs = ["first_stream_filter", "second_stream_filter", "", "fourth_stream_filter"]
         for s in test_strs:
             dq.stream_filter = s
@@ -282,16 +282,18 @@ class TestVitalDatabaseQuery(object):
 
 
     def test_set_and_get_temporal_bounds(self):
-        # TODO: uninitialized?
-
         dq = self._create_database_query()
+        # First check the defaults
+        nt.assert_false(dq.temporal_lower_bound().is_valid())
+        nt.assert_false(dq.temporal_upper_bound().is_valid())
+
         test_bounds = [(Timestamp(100, 1), Timestamp(100, 1)),
                        (Timestamp(100, 1), Timestamp(200, 2)),
                        (Timestamp(300, 5), Timestamp(400, 6))]
 
         for (t1, t2) in test_bounds:
             dq.set_temporal_bounds(t1, t2)
-            nt.ok_(dq.temporal_lower_bound() == t1)
+            nt.assert_equals(dq.temporal_lower_bound(), t1)
             nt.assert_equals(dq.temporal_upper_bound(), t2)
 
         # Check setting it again
@@ -303,14 +305,10 @@ class TestVitalDatabaseQuery(object):
             "Failed to set upper bound to same value")
 
 
-    # TODO: this doesn't throw an error!
-    # If the upper temporal bound is
-    # less than lower bound, the C++ implementation
-    # throws an std::logic error
-    # @nt.raises(RuntimeError)
-    # def test_bad_set_bounds_logic_error(self):
-    #     dq = self._create_database_query()
-    #     dq.set_temporal_bounds(Timestamp(200, 2), Timestamp(100, 1))
+    @nt.raises(RuntimeError)
+    def test_bad_set_bounds_logic_error(self):
+        dq = self._create_database_query()
+        dq.set_temporal_bounds(Timestamp(200, 2), Timestamp(100, 1))
 
 
 
