@@ -21,6 +21,8 @@ from kwiver.vital.types.rotation import *
 from kwiver.vital.types.similarity import *
 from kwiver.vital.types.timestamp import *
 from kwiver.vital.types.track import *
+from kwiver.vital.types.track_descriptor import *
 from kwiver.vital.types.track_set import *
+from kwiver.vital.types.uid import *
 from kwiver.vital.types.object_track_set import *
 from kwiver.vital.types.activity_types import *

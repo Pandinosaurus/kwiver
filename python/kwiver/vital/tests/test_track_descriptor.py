@@ -55,7 +55,6 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
 
     ##################### Tests on track_descriptor #####################
 
-
     def test_create_track_descriptors(self):
         td1 = track_descriptor.TrackDescriptor.create("test_type")
         td2 = track_descriptor.TrackDescriptor.create("")
@@ -156,7 +155,7 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
         tds = self._create_track_descriptors()
         for td in tds:
             # So we have some initial values
-            td.resize_descriptor(5, 20)
+            td.resize_descriptor(3, 20)
             dd = td.get_descriptor()
             dd[0] = 99
             # establish that the first element changed in dd
@@ -164,6 +163,9 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
             # establish that the first element changed in the
             # track descriptors internal descriptor member
             np.testing.assert_almost_equal(td[0], 99)
+            # Check the rest didn't change
+            np.testing.assert_almost_equal(td[1], 20)
+            np.testing.assert_almost_equal(td[2], 20)
 
     def test_set_descriptor_wrong_type(self):
         tds = self._create_track_descriptors()
@@ -253,27 +255,47 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
             td.resize_descriptor(0)
             nt.assert_false(td.has_descriptor())
 
-    # TODO: uncomment after == operator figured out
-    # def test_set_and_get_history(self):
-    #     tds = self._create_track_descriptors()
-    #     histories = list(self._create_history_entries())
+    def test_set_and_get_history(self):
+        tds = self._create_track_descriptors()
+        histories = list(self._create_history_entries())
+        histories_cpy = list(self._create_history_entries())
+        for td in tds:
+            nt.assert_equals(td.get_history(), [])
+            td.set_history(histories)
 
-    #     for td in tds:
-    #         nt.assert_equals(td.get_history(), [])
-    #         td.set_history(histories)
-    #         nt.assert_equals(td.get_history(), histories)
+            history_out = td.get_history()
+            nt.assert_equals(len(history_out), 2)
+
+            # Check that the first element is the same
+            # == operator will return false since first timestamp is invalid
+            nt.assert_false(history_out[0].get_timestamp().is_valid())
+            nt.assert_equals(history_out[0].get_image_location(), histories_cpy[0].get_image_location())
+            nt.assert_equals(history_out[0].get_world_location(), histories_cpy[0].get_world_location())
+
+            # Check that the second element is the same
+            nt.assert_equals(history_out[1], histories_cpy[1])
 
 
-    # TODO: uncomment after == operator figured out
-    # def test_add_history_entry(self):
-    #     tds = self._create_track_descriptors()
-    #     (h1, h2) = self._create_history_entries()
+    def test_add_history_entry(self):
+        tds = self._create_track_descriptors()
+        histories = list(self._create_history_entries())
+        histories_cpy = list(self._create_history_entries())
 
-    #     for td in tds:
-    #         nt.assert_equals(td.get_history(), [])
+        for td in tds:
+            nt.assert_equals(td.get_history(), [])
 
-    #         td.add_history_entry(h1)
-    #         nt.assert_equals(td.get_history(), [h1])
+            td.add_history_entry(histories[0])
+            history_out = td.get_history()
+            nt.assert_false(history_out[0].get_timestamp().is_valid())
+            nt.assert_equals(history_out[0].get_image_location(), histories_cpy[0].get_image_location())
+            nt.assert_equals(history_out[0].get_world_location(), histories_cpy[0].get_world_location())
 
-    #         td.add_history_entry(h2)
-    #         nt.assert_equals(td.get_history(), [h1, h2])
+            td.add_history_entry(histories[1])
+            history_out = td.get_history()
+            # Check that the first is still correct
+            nt.assert_false(history_out[0].get_timestamp().is_valid())
+            nt.assert_equals(history_out[0].get_image_location(), histories_cpy[0].get_image_location())
+            nt.assert_equals(history_out[0].get_world_location(), histories_cpy[0].get_world_location())
+
+            # Can use == on the second
+            nt.assert_equals(history_out[1], histories_cpy[1])

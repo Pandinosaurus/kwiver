@@ -36,12 +36,12 @@
 #include <pybind11/stl.h>
 
 namespace py=pybind11;
-namespace kv = kwiver::vital;
+namespace kv=kwiver::vital;
 
 PYBIND11_MODULE(track_descriptor, m)
 {
 
-
+  // First the history_entry class nested in track_descriptor
   py::class_<kv::track_descriptor::history_entry, std::shared_ptr<kv::track_descriptor::history_entry>>(m, "HistoryEntry")
   .def(py::init<const kv::timestamp&,
                 const kv::track_descriptor::history_entry::image_bbox_t&,
@@ -51,8 +51,21 @@ PYBIND11_MODULE(track_descriptor, m)
   .def("get_timestamp", &kv::track_descriptor::history_entry::get_timestamp)
   .def("get_image_location", &kv::track_descriptor::history_entry::get_image_location)
   .def("get_world_location", &kv::track_descriptor::history_entry::get_world_location)
+  .def("__eq__", [](kv::track_descriptor::history_entry self, kv::track_descriptor::history_entry other)
+                  {
+                    return(self.get_timestamp() == other.get_timestamp() &&
+                           self.get_image_location() == other.get_image_location() &&
+                           self.get_world_location() == other.get_world_location());
+                  })
+  .def("__ne__", [](kv::track_descriptor::history_entry self, kv::track_descriptor::history_entry other)
+                  {
+                    return(self.get_timestamp() != other.get_timestamp() ||
+                           self.get_image_location() != other.get_image_location() ||
+                           self.get_world_location() != other.get_world_location());
+                  })
   ;
 
+  // Now the track_descriptor_class
   py::class_<kv::track_descriptor, std::shared_ptr<kv::track_descriptor>>(m, "TrackDescriptor")
   .def_static("create",
         static_cast<kv::track_descriptor_sptr (*) (std::string const&)>(&kv::track_descriptor::create))

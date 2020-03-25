@@ -183,6 +183,13 @@ target_link_libraries(python-vital.types-track
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(track_descriptor
+  vital/types
+  track_descriptor.cxx)
+target_link_libraries(python-vital.types-track_descriptor
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(track_set
   vital/types
   track_set.cxx)
@@ -227,6 +234,7 @@ if(NOT SKBUILD)
     similarity
     timestamp
     track
+    track_descriptor
     track_set
     uid
     object_track_set
