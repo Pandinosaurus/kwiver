@@ -34,10 +34,10 @@ Tests for Python interface to vital::database_query
 
 """
 
-from kwiver.vital.types import database_query, uid, Timestamp
+from kwiver.vital.types import database_query, uid, track_descriptor, Timestamp
 
 import nose.tools as nt
-
+import numpy as np
 
 class TestVitalDatabaseQuery(object):
     def _create_database_query(self):
@@ -238,13 +238,37 @@ class TestVitalDatabaseQuery(object):
         dq = self._create_database_query()
         dq.stream_filter = 10
 
+    # Just gets a list of 3 track_descriptors, each with TDSIZE random entries
+    def _create_track_descriptor_set(self):
+        ret_track_descriptor_set = []
+        lists_used = []
+        TDSIZE = 5
+        for i in range(3):
+            l = np.random.uniform(low=0.0, high=1000, size=TDSIZE)
+            td = track_descriptor.TrackDescriptor.create("td" + str(i))
+            td.resize_descriptor(TDSIZE)
+            for j in range(TDSIZE):
+                td[j] = l[j]
 
+            ret_track_descriptor_set.append(td)
+            lists_used.append(l)
+        return (ret_track_descriptor_set, lists_used)
 
-
-
-    # TODO: unbound type
+    # TODO: bind track descriptor set
     # def test_set_and_get_descriptors(self):
-    #     pass
+    #     dq = self._create_database_query()
+
+    #     nt.assert_equals(dq.descriptors, [])
+
+    #     # Test getting and setting a few values
+    #     (td_set, lists_used) = self._create_track_descriptor_set()
+    #     dq.descriptors = td_set
+    #     for td, l in zip(dq.descriptors, lists_used):
+    #         np.testing.assert_array_almost_equal(td.todoublearray(), l)
+
+    #     dq.descriptors = []
+    #     nt.assert_equals(dq.descriptors, [])
+
 
 
     @nt.raises(TypeError)
@@ -321,7 +345,4 @@ class TestVitalDatabaseQuery(object):
     def test_empty_set_bounds(self):
         dq = self._create_database_query()
         dq.set_temporal_bounds()
-
-
-
 

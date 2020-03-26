@@ -32,6 +32,8 @@
 #include <vital/types/database_query.h>
 
 #include <pybind11/pybind11.h>
+#include <memory>
+#include <pybind11/stl.h>
 
 namespace py=pybind11;
 
