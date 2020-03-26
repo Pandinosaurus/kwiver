@@ -52,7 +52,6 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
         h2 = track_descriptor.HistoryEntry(
             timestamp.Timestamp(123, 1),
             bounding_box.BoundingBox(45, 50, 55, 60),
-            bounding_box.BoundingBox(65, 70, 75, 80)
         )
         return (h1, h2)
 
@@ -66,7 +65,6 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
         track_descriptor.HistoryEntry(
             timestamp.Timestamp(123, 1),
             bounding_box.BoundingBox(45, 50, 55, 60),
-            bounding_box.BoundingBox(65, 70, 75, 80)
         )
 
     def test_get_timestamp(self):
@@ -89,7 +87,7 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
         (h1, h2) = self._create_history_entries()
 
         nt.assert_equals(h1.get_world_location(), bounding_box.BoundingBox(25, 30, 35, 40))
-        nt.assert_equals(h2.get_world_location(), bounding_box.BoundingBox(65, 70, 75, 80))
+        nt.assert_equals(h2.get_world_location(), bounding_box.BoundingBox(0, 0, 0, 0))
 
     ##################### Tests on track_descriptor #####################
 
