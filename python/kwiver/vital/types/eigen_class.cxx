@@ -28,46 +28,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <Eigen/Core>
-
-#include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
-#include <pybind11/stl.h>
+#include "eigen_class.h"
 
 namespace py = pybind11;
+namespace kvp = kwiver::vital::python;
 
-class EigenArray
+void eigen_array(py::module &m)
 {
-  // We're assuming always dynamic, to make things simpler for first pass
-  // TODO We can edit this later to use subclasses instead of two parallel
-  Eigen::MatrixXd double_mat;
-  Eigen::MatrixXf float_mat;
-  char type;
+  py::class_< kvp::EigenArray, std::shared_ptr<kvp::EigenArray> >(m, "EigenArray")
+  .def(py::init< int, int, bool, bool, char>(),
+         py::arg("rows")=2, py::arg("cols")=1,
+         py::arg("dynamic_rows")=false, py::arg("dynamic_cols")=false,
+         py::arg("type")='d')
+  .def("get_matrix", &kvp::EigenArray::getMatrix, "Access the C++ matrix by reference", py::return_value_policy::reference_internal)
+  .def("copy_matrix", &kvp::EigenArray::getMatrix, "Creates a python copy of the matrix")
+  .def_static("from_array", &kvp::EigenArray::fromArray,
+         py::arg("data"), py::arg("type")='d')
+  ;
+}
 
-  public:
 
-    EigenArray(int rows = 2,
-               int cols = 1,
-               bool dynamic_rows = false,
-               bool dynamic_cols = false,
-               char ctype = 'd');
-
-    void fromVectorF(std::vector< std::vector<float> >);
-    void fromVectorD(std::vector< std::vector<double> >);
-    static EigenArray fromArray(py::object, char);
-
-    void setType(char ctype) { this->type = ctype; };
-    char getType() { return type; };
-
-    py::object getMatrix();
-    Eigen::MatrixXd getMatrixD() { return double_mat; };
-    Eigen::MatrixXf getMatrixF() { return float_mat; };
-    void setMatrixF();
-    void setMatrixD();
-
-};
-
-EigenArray::
+kvp::EigenArray::
 EigenArray(int rows,
            int cols,
            bool dynamic_rows, // we're ignoring these, but keeping them in for API reasons
@@ -81,7 +62,7 @@ EigenArray(int rows,
 }
 
 py::object
-EigenArray::
+kvp::EigenArray::
 getMatrix()
 {
   if(this->getType() == 'd') return py::cast(&double_mat);
@@ -90,7 +71,7 @@ getMatrix()
 }
 
 void
-EigenArray::
+kvp::EigenArray::
 fromVectorF(std::vector< std::vector<float> > data_vec)
 {
   unsigned int rows = data_vec.size();
@@ -110,7 +91,7 @@ fromVectorF(std::vector< std::vector<float> > data_vec)
 }
 
 void
-EigenArray::
+kvp::EigenArray::
 fromVectorD(std::vector< std::vector<double> > data_vec)
 {
   unsigned int rows = data_vec.size();
@@ -129,11 +110,11 @@ fromVectorD(std::vector< std::vector<double> > data_vec)
   }
 }
 
-EigenArray
-EigenArray::
+kvp::EigenArray
+kvp::EigenArray::
 fromArray(py::object data, char ctype = 'd')
 {
-  EigenArray retMat;
+  kvp::EigenArray retMat;
 
   retMat.setType(ctype);
 

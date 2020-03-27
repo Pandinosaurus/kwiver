@@ -35,7 +35,7 @@
 #include <pybind11/eigen.h>
 
 #include "covariance_class.cxx"
-#include "eigen_class.cxx"
+#include "eigen_class.h"
 #include "rotation_class.cxx"
 
 namespace py = pybind11;
@@ -62,19 +62,19 @@ PYBIND11_MODULE(camera, m)
   py::class_<kwiver::vital::simple_camera_perspective,
              std::shared_ptr<kwiver::vital::simple_camera_perspective> >(m, "Camera")
   .def(py::init<>())
-  .def(py::init([](EigenArray &center)
+  .def(py::init([](kwiver::vital::python::EigenArray &center)
                   {
                     Eigen::Vector3d vec(center.getMatrixD().data());
                     kwiver::vital::simple_camera_perspective ret_cam(vec, kwiver::vital::rotation_<double>());
                     return ret_cam;
                   }))
-  .def(py::init([](EigenArray &center, PyRotation &rotation)
+  .def(py::init([](kwiver::vital::python::EigenArray &center, PyRotation &rotation)
                   {
                     Eigen::Vector3d vec(center.getMatrixD().data());
                     kwiver::vital::simple_camera_perspective ret_cam(vec, rotation.getRotD());
                     return ret_cam;
                   }))
-  .def(py::init([](EigenArray &center, PyRotation &rotation, py::object &int_obj)
+  .def(py::init([](kwiver::vital::python::EigenArray &center, PyRotation &rotation, py::object &int_obj)
                   {
                     Eigen::Vector3d vec(center.getMatrixD().data());
                     kwiver::vital::simple_camera_intrinsics c_int = int_obj.cast<kwiver::vital::simple_camera_intrinsics>();

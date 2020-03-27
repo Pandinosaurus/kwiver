@@ -3,11 +3,13 @@ project(vital_python_types)
 include_directories(${pybind11_INCLUDE_DIR})
 
 set( vital_python_headers
+     eigen_class.h
      image.h
      image_container.h
   )
 
 set( vital_python_sources
+     eigen_class.cxx
      image.cxx
      image_container.cxx
      types_module.cxx
@@ -120,13 +122,6 @@ target_link_libraries(python-vital.types-detected_object_type
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
-kwiver_add_python_library(eigen
-  vital/types
-  eigen.cxx)
-target_link_libraries(python-vital.types-eigen
-  PUBLIC ${PYTHON_LIBRARIES}
-         vital)
-
 kwiver_add_python_library(feature
   vital/types
   feature.cxx)
@@ -152,6 +147,13 @@ kwiver_add_python_library(landmark
   vital/types
   landmark.cxx)
 target_link_libraries(python-vital.types-landmark
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
+kwiver_add_python_library(polygon
+  vital/types
+  polygon.cxx)
+target_link_libraries(python-vital.types-polygon
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
@@ -226,10 +228,10 @@ if(NOT SKBUILD)
     detected_object_type
     detected_object
     detected_object_set
-    eigen
     feature
     homography
     landmark
+    polygon
     rotation
     similarity
     timestamp

@@ -13,10 +13,10 @@ from kwiver.vital.types.descriptor_set import *
 from kwiver.vital.types.detected_object_type import *
 from kwiver.vital.types.detected_object import *
 from kwiver.vital.types.detected_object_set import *
-from kwiver.vital.types.eigen import *
 from kwiver.vital.types.feature import *
 from kwiver.vital.types.homography import *
 from kwiver.vital.types.landmark import *
+from kwiver.vital.types.polygon import *
 from kwiver.vital.types.rotation import *
 from kwiver.vital.types.similarity import *
 from kwiver.vital.types.timestamp import *

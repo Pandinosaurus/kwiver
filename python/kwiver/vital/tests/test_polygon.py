@@ -57,14 +57,14 @@ class TestVitalPolygon(object):
         Polygon(pts)
 
 
-    # def test_initial_at(self):
-    #     pt1, pt2, pt3, pt4 = self._create_points()
-    #     _, p2 = self._create_polygons()
+    def test_initial_at(self):
+        pt1, pt2, pt3, pt4 = self._create_points()
+        _, p2 = self._create_polygons()
 
-    #     nt.assert_equal(pt1, p2.at(0))
-    #     nt.assert_equal(pt1, p2.at(1))
-    #     nt.assert_equal(pt1, p2.at(2))
-    #     nt.assert_equal(pt1, p2.at(3))
+        nt.assert_equal(pt1, p2.at(0))
+        nt.assert_equal(pt1, p2.at(1))
+        nt.assert_equal(pt1, p2.at(2))
+        nt.assert_equal(pt1, p2.at(3))
 
 
     # def test_initial_num_vertices(self):

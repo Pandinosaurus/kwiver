@@ -39,7 +39,7 @@
 namespace py=pybind11;
 namespace kv=kwiver::vital;
 
-
+//TODO: references in below function?? ==operator for vectors/eigen_array
 
 kv::polygon
 new_from_point_list(py::list py_pt_list)
@@ -47,7 +47,7 @@ new_from_point_list(py::list py_pt_list)
   std::vector<kv::vector_2d> pt_list;
   for(auto py_pt : py_pt_list)
   {
-    pt_list.push_back(py::cast<EigenArray>(py_pt).getMatrixD());
+    pt_list.push_back(py::cast<kv::python::EigenArray>(py_pt).getMatrixD());
   }
   return kv::polygon(pt_list);
 }
@@ -57,7 +57,7 @@ PYBIND11_MODULE(polygon, m)
 {
   py::class_< kv::polygon, std::shared_ptr< kv::polygon > >(m, "Polygon")
   .def(py::init<>())
-  .def(py::init< const std::vector< kv::polygon::point_t >& >())
+  .def(py::init(&new_from_point_list))
   .def("push_back",
     static_cast<void (kv::polygon::*) (double, double)>(&kv::polygon::push_back))
   .def("push_back",

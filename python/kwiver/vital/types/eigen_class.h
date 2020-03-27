@@ -28,25 +28,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "eigen_class.cxx"
 
+#include <Eigen/Core>
 #include <pybind11/pybind11.h>
+
 #include <pybind11/eigen.h>
+#include <pybind11/stl.h>
+
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(eigen, m)
+void eigen_array(py::module &m);
+
+namespace kwiver {
+namespace vital {
+namespace python {
+class EigenArray
 {
+  // We're assuming always dynamic, to make things simpler for first pass
+  // TODO We can edit this later to use subclasses instead of two parallel
+  Eigen::MatrixXd double_mat;
+  Eigen::MatrixXf float_mat;
+  char type;
 
-  py::class_< EigenArray, std::shared_ptr<EigenArray> >(m, "EigenArray")
-  .def(py::init< int, int, bool, bool, char>(),
-         py::arg("rows")=2, py::arg("cols")=1,
-         py::arg("dynamic_rows")=false, py::arg("dynamic_cols")=false,
-         py::arg("type")='d')
-  .def("get_matrix", &EigenArray::getMatrix, "Access the C++ matrix by reference", py::return_value_policy::reference_internal)
-  .def("copy_matrix", &EigenArray::getMatrix, "Creates a python copy of the matrix")
-  .def_static("from_array", &EigenArray::fromArray,
-         py::arg("data"), py::arg("type")='d')
-  ;
+  public:
 
-}
+    EigenArray(int rows = 2,
+               int cols = 1,
+               bool dynamic_rows = false,
+               bool dynamic_cols = false,
+               char ctype = 'd');
+
+    void fromVectorF(std::vector< std::vector<float> >);
+    void fromVectorD(std::vector< std::vector<double> >);
+    static EigenArray fromArray(py::object, char);
+
+    void setType(char ctype) { this->type = ctype; };
+    char getType() { return type; };
+
+    py::object getMatrix();
+    Eigen::MatrixXd getMatrixD() { return double_mat; };
+    Eigen::MatrixXf getMatrixF() { return float_mat; };
+    void setMatrixF();
+    void setMatrixD();
+
+};
+} } }

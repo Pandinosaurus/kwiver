@@ -23,6 +23,7 @@ set(__testable_modnames
   test_object_track_state
   test_object_track_set
   test_rotation
+  test_polygon
   test_similarity
   test_timestamp
   test_track
