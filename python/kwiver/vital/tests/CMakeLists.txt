@@ -14,7 +14,6 @@ set(__testable_modnames
   test_database_query
   test_descriptor
   test_descriptor_set
-  test_eigen_numpy
   test_feature
   test_homography
   test_image

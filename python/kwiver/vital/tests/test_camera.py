@@ -36,16 +36,14 @@ Tests for Camera interface class.
 from __future__ import print_function
 import math
 import unittest
-from numpy.random import rand
 import nose.tools
 import pytest
-import numpy
+import numpy as np
 import os
 
 from kwiver.vital.types import (
     Camera,
     CameraIntrinsics,
-    EigenArray,
     Rotation,
 )
 
@@ -56,65 +54,64 @@ class TestVitalCamera (unittest.TestCase):
         # just seeing that basic construction doesn't blow up
         cam = Camera()
 
-        c = EigenArray(3)
+        c = np.zeros(3)
         r = Rotation()
         ci = CameraIntrinsics()
         cam = Camera(c, r, ci)
 
     def test_center_default(self):
         cam = Camera()
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.center,
             [0,0,0]
         )
 
     def test_center_initialized(self):
-        expected_c = EigenArray(3)
-        expected_c.get_matrix()[:] = [[1],[2],[3]]
+        expected_c = np.array([1, 2, 3])
         cam = Camera(expected_c)
-        numpy.testing.assert_array_equal(
-            numpy.array([cam.center]).T,
-            expected_c.get_matrix()
+        np.testing.assert_array_equal(
+            cam.center.T,
+            expected_c
         )
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.center,
             [1,2,3]
         )
 
     def test_translation_default(self):
         cam = Camera()
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.translation,
             [0, 0, 0]
         )
 
     def test_translation_initialized(self):
-        center = EigenArray.from_array([[1],[2],[3]])
+        center = np.array([1, 2, 3])
         rotation = Rotation.from_axis_angle([0, 1, 0], math.pi / 2.)
         cam = Camera(center, rotation)
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.translation,
-            -(rotation * center.get_matrix())
+            -(rotation * center)
         )
 
     def test_covariance_default(self):
         cam = Camera()
         # Should be default value of an identity matrix
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.covariance.to_matrix(),
-            numpy.eye(3),
+            np.eye(3),
         )
 
     def test_rotation_default(self):
         cam = Camera()
         # Should be identity by default
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.rotation.matrix(),
-            numpy.eye(3),
+            np.eye(3),
         )
 
     def test_rotation_initialized(self):
-        center = EigenArray.from_array([[1],[2],[3]])
+        center = np.array([1, 2, 3])
         r_expected = Rotation.from_axis_angle([0,1,0], math.pi / 8)
         cam = Camera(center, r_expected)
         nose.tools.assert_is_not(cam.rotation, r_expected)
@@ -122,12 +119,12 @@ class TestVitalCamera (unittest.TestCase):
 
     def test_asmatrix_default(self):
         cam = Camera()
-        m_expected = numpy.matrix("1 0 0 0;"
+        m_expected = np.matrix("1 0 0 0;"
                                   "0 1 0 0;"
                                   "0 0 1 0")
         print(cam.as_matrix())
         print(m_expected)
-        numpy.testing.assert_array_equal(
+        np.testing.assert_array_equal(
             cam.as_matrix(),
             m_expected
         )
@@ -135,8 +132,8 @@ class TestVitalCamera (unittest.TestCase):
     def test_depth(self):
         cam = Camera()
 
-        pos_pt = numpy.array([1,0,1])
-        neg_pt = numpy.array([0,0,-100])
+        pos_pt = np.array([1,0,1])
+        neg_pt = np.array([0,0,-100])
 
         nose.tools.assert_equal(cam.depth(pos_pt), 1)
         nose.tools.assert_equal(cam.depth(neg_pt), -100)
@@ -147,7 +144,7 @@ class TestVitalCamera (unittest.TestCase):
         nose.tools.assert_equal(cam1, cam1)
         nose.tools.assert_equal(cam1, cam2)
 
-        center = EigenArray.from_array([[1],[2],[3]])
+        center = np.array([1, 2, 3])
         rotation = Rotation.from_axis_angle([0, 1, 0], math.pi / 2.)
         cam1 = Camera(center, rotation)
         cam2 = Camera(center, rotation)
@@ -162,9 +159,7 @@ class TestVitalCamera (unittest.TestCase):
         print("Default newcam string:\n%s" % cam2.as_string())
         nose.tools.assert_equal(cam, cam2)
 
-        center = EigenArray.from_array([[1],
-                                        [2],
-                                        [3]])
+        center = np.array([1, 2, 3])
         rotation = Rotation.from_axis_angle([0, 1, 0], math.pi / 2.)
         cam = Camera(center, rotation)
         cam_s = cam.as_string()
@@ -174,21 +169,20 @@ class TestVitalCamera (unittest.TestCase):
         nose.tools.assert_equal(cam, cam2)
 
     def test_clone_look_at(self):
-        pp = EigenArray.from_array([[300], [400]])
+        pp = np.array([300, 400])
         k = CameraIntrinsics(1000, [300, 400])
-        focus = EigenArray.from_array([[0], [1], [-2]])
-        center = EigenArray.from_array([[3],[-4],[7]])
+        center = np.array([3,-4,7])
 
         base = Camera(center, Rotation(), k)
-        cam = base.clone_look_at(numpy.array([0,1,2]))
+        cam = base.clone_look_at(np.array([0,1,2]))
         nose.tools.assert_not_equal(base, cam)
 
         ifocus = cam.project([0,1,2])
-        nose.tools.assert_almost_equal(numpy.linalg.norm(ifocus - pp.get_matrix().T, 2),
+        nose.tools.assert_almost_equal(np.linalg.norm(ifocus - pp.T, 2),
                                        0., 12)
 
         ifocus_up = cam.project([0,1,4])
-        tmp = (ifocus_up - pp.get_matrix().T)[0]
+        tmp = (ifocus_up - pp)
         nose.tools.assert_almost_equal(tmp[0], 0., 12)
         nose.tools.assert_true(tmp[1] < 0.)
 
@@ -198,9 +192,8 @@ class TestVitalCamera (unittest.TestCase):
 
         try:
             for _ in range(100):
-                c = (rand(3)*2-1)*100
-                center = EigenArray.from_array([c])
-                rotation = Rotation.from_quaternion(numpy.random.rand(4)*2-1)
+                center = (np.random.rand(3)*2-1)*100
+                rotation = Rotation.from_quaternion(np.random.rand(4)*2-1)
                 intrinsics = CameraIntrinsics(10, (5, 5), 1.2, 0.5, [4, 5, 6])
                 c1 = Camera(center, rotation,
                             intrinsics)
@@ -208,7 +201,7 @@ class TestVitalCamera (unittest.TestCase):
                 c1.write_krtd_file(fname)
                 c2 = Camera.from_krtd_file(fname)
 
-                err = numpy.linalg.norm(c1.center-c2.center)
+                err = np.linalg.norm(c1.center-c2.center)
                 assert err < 1e-9, ''.join(['Centers are different by ',
                                             str(err)])
 
@@ -217,9 +210,9 @@ class TestVitalCamera (unittest.TestCase):
                 attr = ['focal_length','aspect_ratio','principle_point','skew',
                         'dist_coeffs']
                 for att in attr:
-                    v1 = numpy.array(getattr(c1.intrinsics,att))
-                    v2 = numpy.array(getattr(c2.intrinsics,att))
-                    err = numpy.linalg.norm(v1-v2)
+                    v1 = np.array(getattr(c1.intrinsics,att))
+                    v2 = np.array(getattr(c2.intrinsics,att))
+                    err = np.linalg.norm(v1-v2)
                     assert err < 1e-8, ''.join(['Difference ',str(err),
                                                  ' for attribute: ',att])
         finally:

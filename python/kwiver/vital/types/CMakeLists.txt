@@ -3,13 +3,11 @@ project(vital_python_types)
 include_directories(${pybind11_INCLUDE_DIR})
 
 set( vital_python_headers
-     eigen_class.h
      image.h
      image_container.h
   )
 
 set( vital_python_sources
-     eigen_class.cxx
      image.cxx
      image_container.cxx
      types_module.cxx

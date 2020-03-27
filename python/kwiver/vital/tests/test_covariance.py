@@ -37,10 +37,9 @@ from __future__ import print_function
 import unittest
 
 import nose.tools
-import numpy
+import numpy as np
 
 from kwiver.vital.types import Covariance
-from kwiver.vital.types import EigenArray
 
 class TestVitalCovariance (unittest.TestCase):
 
@@ -75,37 +74,33 @@ class TestVitalCovariance (unittest.TestCase):
         print('constructed matrix:\n', c.to_matrix())
 
     def test_new_matrix(self):
-        a = EigenArray(2, 2, type='d')
-        m = a.get_matrix()
-        m[:] = 1.
+        m = np.array([[1, 1], [1, 1]])
         c = Covariance.from_matrix(2, 'd', m)
         m_out = c.to_matrix()
         print('input matrix:\n', m)
         print('output matrix:\n', m_out)
-        numpy.testing.assert_array_equal(m_out, m)
+        np.testing.assert_array_equal(m_out, m)
 
         # Type casting should be handled
-        a = EigenArray(2, 2, type='f')
-        m = a.get_matrix()
-        m[:] = 1.
+        m = np.array([[1, 1], [1, 1]], dtype = np.float32)
         c = Covariance.from_matrix(2, 'd', m)
         m_out = c.to_matrix()
         print('input matrix:\n', m)
         print('output matrix:\n', m_out)
-        numpy.testing.assert_array_equal(m_out, m)
+        np.testing.assert_array_equal(m_out, m)
 
         # Any other numpy array of the correct shape should be acceptable
-        m = numpy.ndarray((2, 2))
+        m = np.ndarray((2, 2))
         m[:] = 3.
         c = Covariance.from_matrix(2, 'f', init=m)
         m_out = c.to_matrix()
         print('input matrix:\n', m)
         print('output matrix:\n', m_out)
-        numpy.testing.assert_array_equal(m_out, m)
+        np.testing.assert_array_equal(m_out, m)
 
         # Diagonally congruent values should be averages when initializing with
         # matrix
-        m = numpy.eye(3, dtype=numpy.double)
+        m = np.eye(3, dtype=np.double)
         m[0,2] = 2.
         m_expected = m.copy()
         m_expected[0,2] = 1.
@@ -114,10 +109,10 @@ class TestVitalCovariance (unittest.TestCase):
         m_out = c.to_matrix()
         print('input matrix:\n', m)
         print('output matrix:\n', m_out)
-        numpy.testing.assert_array_equal(m_out, m_expected)
+        np.testing.assert_array_equal(m_out, m_expected)
 
     def test_get_value(self):
-        m = numpy.ndarray((3, 3))
+        m = np.ndarray((3, 3))
         # [[ 0 1 2 ]               [[ 0 2 4 ]
         #  [ 3 4 5 ]  -> should ->  [ 2 4 6 ]
         #  [ 6 7 8 ]]               [ 4 6 8 ]]
@@ -166,7 +161,7 @@ class TestVitalCovariance (unittest.TestCase):
         )
 
     def test_set(self):
-        m = numpy.ndarray((3, 3))
+        m = np.ndarray((3, 3))
         # [[ 0 1 2 ]                      [[ 0 2 4 ]
         #  [ 3 4 5 ]  -> should become ->  [ 2 4 6 ]
         #  [ 6 7 8 ]]                      [ 4 6 8 ]]

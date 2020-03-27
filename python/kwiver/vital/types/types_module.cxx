@@ -37,13 +37,11 @@
 #include <pybind11/pybind11.h>
 #include <python/kwiver/vital/types/image.h>
 #include <python/kwiver/vital/types/image_container.h>
-#include <python/kwiver/vital/types/eigen_class.h>
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(types, m)
 {
-  eigen_array(m);
   image(m);
   image_container(m);
 }

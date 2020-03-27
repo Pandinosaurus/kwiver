@@ -37,13 +37,12 @@ import logging
 import math
 from six.moves import range
 
-import numpy
+import numpy as np
 
 from kwiver.vital.types import (
     Camera,
     CameraIntrinsics,
     CameraMap,
-    EigenArray,
     Feature,
     Landmark,
     Rotation,
@@ -54,10 +53,7 @@ from kwiver.vital.types import (
 
 
 def random_point_3d(stddev):
-    pt = [[numpy.random.normal(0., stddev)],
-          [numpy.random.normal(0., stddev)],
-          [numpy.random.normal(0., stddev)]]
-    return EigenArray.from_iterable(pt, target_shape=(3, 1))
+    return np.random.normal(loc=0., scale=stddev, size=3)
 
 
 
@@ -95,7 +91,7 @@ def init_cameras(num_cams=20, intrinsics=None):
     if intrinsics is None:
         intrinsics = CameraIntrinsics(1000, (640, 480))
     r = Rotation()
-    c = EigenArray.from_iterable((0, 0, 1))
+    c = np.array([0, 0, 1])
     d = {}
     for i in range(num_cams):
         cam = Camera(c, r, intrinsics).clone_look_at([0, 0, 0],
@@ -140,7 +136,7 @@ def subset_tracks(trackset, keep_fraction=0.75):
 
         msg = 'track %d:' % t.id,
         for ts in t:
-            if numpy.random.rand() < keep_fraction:
+            if np.random.rand() < keep_fraction:
                 nt.append(ts)
                 msg += '.',
             else:
@@ -156,7 +152,7 @@ def reprojection_error_vec(cam, lm, feat):
     :type cam: Camera
     :type lm: Landmark
     :type feat: Feature
-    :rtype: EigenArray
+    :rtype: numpy array
     """
     pt = cam.project(lm.loc)
     return pt - feat.location
@@ -180,20 +176,20 @@ def create_numpy_image(dtype_name, nchannels, order='c'):
         shape = (5, 4)
     else:
         shape = (5, 4, nchannels)
-    size = numpy.prod(shape)
+    size = np.prod(shape)
 
-    dtype = numpy.dtype(dtype_name)
+    dtype = np.dtype(dtype_name)
 
     if dtype_name == 'bool':
-        np_img = numpy.zeros(size, dtype=dtype).reshape(shape)
+        np_img = np.zeros(size, dtype=dtype).reshape(shape)
         np_img[0::2] = 1
     else:
-        np_img = numpy.arange(size, dtype=dtype).reshape(shape)
+        np_img = np.arange(size, dtype=dtype).reshape(shape)
 
     if order.startswith('c'):
-        np_img = numpy.ascontiguousarray(np_img)
+        np_img = np.ascontiguousarray(np_img)
     elif order.startswith('fortran'):
-        np_img = numpy.asfortranarray(np_img)
+        np_img = np.asfortranarray(np_img)
     else:
         raise KeyError(order)
     if order.endswith('-reverse'):
