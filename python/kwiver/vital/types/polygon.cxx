@@ -32,22 +32,15 @@
 #include <vital/types/polygon.h>
 
 #include <pybind11/pybind11.h>
-#include <memory>
 #include <pybind11/stl.h>
+#include <pybind11/eigen.h>
+
+#include <memory>
 
 namespace py=pybind11;
 namespace kv=kwiver::vital;
 
-// kv::polygon
-// new_from_point_list(py::list py_pt_list)
-// {
-//   std::vector<kv::vector_2d> pt_list;
-//   for(auto py_pt : py_pt_list)
-//   {
-//     pt_list.push_back(py::cast<kv::python::EigenArray>(py_pt).getMatrixD());
-//   }
-//   return kv::polygon(pt_list);
-// }
+
 
 
 PYBIND11_MODULE(polygon, m)
