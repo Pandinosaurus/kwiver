@@ -127,6 +127,13 @@ target_link_libraries(python-vital.types-feature
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(geo_polygon
+  vital/types
+  geo_polygon.cxx)
+target_link_libraries(python-vital.types-geo_polygon
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(homography
   vital/types
   homography.cxx)
@@ -227,6 +234,7 @@ if(NOT SKBUILD)
     detected_object
     detected_object_set
     feature
+    geo_polygon
     homography
     landmark
     polygon
