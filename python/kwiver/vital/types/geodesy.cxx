@@ -34,6 +34,8 @@
 #include <python/kwiver/vital/util/pybind11.h>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
+
 
 #include <memory>
 
@@ -54,7 +56,7 @@ class geo_conversion_trampoline
 {
 public:
   // Inheriting default constructor
-  using deletable_geo_conversion::deletable_geo_conversion; //TODO: should this be here?
+  // using deletable_geo_conversion::deletable_geo_conversion; //TODO: should this be here?
 
   // Override virtual functions
   char const* id() const override;
@@ -80,11 +82,18 @@ PYBIND11_MODULE(geodesy, m)
 
   // TODO: this class strucure compiles, but im not sure if it works. Needs testing
 
-  py::class_<deletable_geo_conversion, geo_conversion_trampoline, std::shared_ptr<deletable_geo_conversion>>(m, "GeoConversion")
-  .def("id", &deletable_geo_conversion::id)
-  .def("describe", &deletable_geo_conversion::describe)
-  .def("__call__", (kv::vector_2d (deletable_geo_conversion::*) (kv::vector_2d const&, int, int)) &deletable_geo_conversion::operator())
-  .def("__call__", (kv::vector_3d (deletable_geo_conversion::*) (kv::vector_3d const&, int, int)) &deletable_geo_conversion::operator())
+  // py::class_<deletable_geo_conversion, geo_conversion_trampoline, std::shared_ptr<deletable_geo_conversion>>(m, "GeoConversion")
+  // .def("id", &deletable_geo_conversion::id)
+  // .def("describe", &deletable_geo_conversion::describe)
+  // .def("__call__", (kv::vector_2d (deletable_geo_conversion::*) (kv::vector_2d const&, int, int)) &deletable_geo_conversion::operator())
+  // .def("__call__", (kv::vector_3d (deletable_geo_conversion::*) (kv::vector_3d const&, int, int)) &deletable_geo_conversion::operator())
+  // ;
+
+  py::class_<kv::utm_ups_zone_t, std::shared_ptr<kv::utm_ups_zone_t>>(m, "UTMUPSZone")
+  .def(py::init<>())
+  .def(py::init<int, bool>())
+  .def_readwrite("number", &kv::utm_ups_zone_t::number)
+  .def_readwrite("north", &kv::utm_ups_zone_t::north)
   ;
 }
 
@@ -115,7 +124,7 @@ geo_conversion_trampoline
 kv::vector_2d
 geo_conversion_trampoline
 ::operator()
-( kv::vector_2d const& point, int from, int to )
+( kv::vector_2d const& point, int from_crs, int to_crs )
 {
   VITAL_PYBIND11_OVERLOAD_PURE_NAME(
     kv::vector_2d,
@@ -123,15 +132,15 @@ geo_conversion_trampoline
     "__call__",
     operator(),
     point,
-    from,
-    to
+    from_crs,
+    to_crs
   );
 }
 
 kv::vector_3d
 geo_conversion_trampoline
 ::operator()
-( kv::vector_3d const& point, int from, int to )
+( kv::vector_3d const& point, int from_crs, int to_crs )
 {
   VITAL_PYBIND11_OVERLOAD_PURE_NAME(
     kv::vector_3d,
@@ -139,7 +148,7 @@ geo_conversion_trampoline
     "__call__",
     operator(),
     point,
-    from,
-    to
+    from_crs,
+    to_crs
   );
 }
