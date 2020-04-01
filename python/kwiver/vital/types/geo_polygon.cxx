@@ -34,6 +34,8 @@
 #include <pybind11/pybind11.h>
 // #include <pybind11/stl.h> TODO
 // #include <pybind11/eigen.h> TODO
+#include <sstream>
+
 
 #include <memory>
 
@@ -51,5 +53,13 @@ PYBIND11_MODULE(geo_polygon, m)
   .def("crs", &kv::geo_polygon::crs)
   .def("set_polygon", &kv::geo_polygon::set_polygon)
   .def("is_empty", &kv::geo_polygon::is_empty)
+  .def("__str__", [](const kv::geo_polygon& self) {
+    std::stringstream res;
+    res << self;
+    return res.str();
+  })
   ;
+
+  m.def("config_block_get_value_cast", &kv::config_block_get_value_cast<kv::config_block_value_t>);
+  m.def("config_block_set_value_cast", &kv::config_block_set_value_cast<kv::geo_polygon>);
 }

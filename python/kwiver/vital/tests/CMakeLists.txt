@@ -15,6 +15,7 @@ set(__testable_modnames
   test_descriptor
   test_descriptor_set
   test_feature
+  test_geo_polygon
   test_geodesy
   test_homography
   test_image
