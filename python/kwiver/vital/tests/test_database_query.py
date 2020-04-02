@@ -34,7 +34,8 @@ Tests for Python interface to vital::database_query
 
 """
 
-from kwiver.vital.types import database_query, uid, track_descriptor, Timestamp
+from kwiver.vital.types import (database_query, uid, track_descriptor,
+    Timestamp, GeoPolygon, Polygon, geodesy as g)
 
 import nose.tools as nt
 import numpy as np
@@ -42,6 +43,10 @@ import numpy as np
 class TestVitalDatabaseQuery(object):
     def _create_database_query(self):
         return database_query.DatabaseQuery()
+
+    def _create_geo_poly(self):
+        p1, p2 = np.array([10, 10]), np.array([10, 50])
+        return GeoPolygon(Polygon([p1, p2]), g.SRID.lat_lon_WGS84)
 
     def test_new(self):
         database_query.DatabaseQuery()
@@ -124,11 +129,6 @@ class TestVitalDatabaseQuery(object):
             dq.type = t
             nt.assert_equals(dq.type, t)
 
-        # Show it doesn't change after setting it to the same value
-        dq.type = test_types[-1]
-        nt.assert_equals(dq.type, test_types[-1],
-            "Setting type to same value failed")
-
     @nt.raises(TypeError)
     def test_bad_set_type(self):
         dq = self._create_database_query()
@@ -138,8 +138,6 @@ class TestVitalDatabaseQuery(object):
     def test_bad_set_type_outside_enum(self):
         dq = self._create_database_query()
         dq.type = int(database_query.query_type.RETRIEVAL) + 1
-
-
 
 
     def test_set_and_get_temporal_filter(self):
@@ -155,11 +153,6 @@ class TestVitalDatabaseQuery(object):
         for f in test_filters:
             dq.temporal_filter = f
             nt.assert_equals(dq.temporal_filter, f)
-
-        # Check that setting it so same value doesn't change
-        dq.temporal_filter = test_filters[-1]
-        nt.assert_equals(dq.temporal_filter, test_filters[-1])
-
 
 
     @nt.raises(TypeError)
@@ -187,10 +180,6 @@ class TestVitalDatabaseQuery(object):
             dq.spatial_filter = f
             nt.assert_equals(dq.spatial_filter, f)
 
-        # Check that setting it so same value doesn't change
-        dq.spatial_filter = test_filters[-1]
-        nt.assert_equals(dq.spatial_filter, test_filters[-1])
-
 
     @nt.raises(TypeError)
     def test_bad_set_spatial_filter_wrong_type(self):
@@ -203,19 +192,29 @@ class TestVitalDatabaseQuery(object):
         dq.spatial_filter = int(database_query.query_filter.DOES_NOT_CONTAIN) + 1
 
 
-    # TODO: unbound type
-    # def test_set_and_get_spatial_region(self):
-    #     pass
+    def test_set_and_get_spatial_region(self):
+        dq = self._create_database_query()
+
+        # Test default
+        nt.ok_(dq.spatial_region.is_empty())
+
+        # Try setting to non empty geo_polygon
+        g_poly = self._create_geo_poly()
+        dq.spatial_region = g_poly
+
+        dq_vertices = dq.spatial_region.polygon().get_vertices()
+        g_poly_vertices = g_poly.polygon().get_vertices()
+        np.testing.assert_array_equal(dq_vertices, g_poly_vertices)
+
+        # Try setting back to empty geo_polygon
+        dq.spatial_region = GeoPolygon()
+        nt.ok_(dq.spatial_region.is_empty())
+
 
     @nt.raises(TypeError)
     def test_bad_set_spatial_region(self):
         dq = self._create_database_query()
         dq.spatial_region = "string, not geo_polygon"
-
-
-
-
-
 
 
     def test_set_and_get_stream_filter(self):
@@ -227,10 +226,6 @@ class TestVitalDatabaseQuery(object):
         for s in test_strs:
             dq.stream_filter = s
             nt.assert_equals(dq.stream_filter, s, "Setting stream_filter to {} failed".format(s))
-
-        # Test setting to the same value
-        dq.stream_filter = dq.stream_filter
-        nt.assert_equals(dq.stream_filter, test_strs[-1], "Setting stream filter to same value failed")
 
 
     @nt.raises(TypeError)
@@ -281,39 +276,27 @@ class TestVitalDatabaseQuery(object):
         nt.assert_equals(dq.descriptors, [])
 
 
-
     @nt.raises(TypeError)
     def test_bad_set_descriptors(self):
         dq = self._create_database_query()
         dq.descriptors = "string, not track_descriptor_set"
 
 
-
-
-
-
     def test_set_and_get_threshold(self):
         dq = self._create_database_query()
         # First check default
-        nt.assert_almost_equal(dq.threshold, 0.0, "Default threshold should be 0.0")
+        nt.assert_almost_equal(dq.threshold, 0.0)
 
         # Now check setting and getting some values
         test_thresholds = [4.0, 3.14, 0.0, 10, 2.71]
         for t in test_thresholds:
             dq.threshold = t
-            nt.assert_almost_equal(dq.threshold, t, "Setting threshold to {} failed".format(t))
-
-        # Now check setting, then getting with a few values
-        dq.threshold = dq.threshold
-        nt.assert_almost_equal(dq.threshold, test_thresholds[-1], "Setting threshold to same value failed")
+            nt.assert_almost_equal(dq.threshold, t)
 
     @nt.raises(TypeError)
     def test_bad_set_threshold(self):
         dq = self._create_database_query()
         dq.threshold = "string, not double"
-
-
-
 
 
     def test_set_and_get_temporal_bounds(self):
@@ -331,21 +314,11 @@ class TestVitalDatabaseQuery(object):
             nt.assert_equals(dq.temporal_lower_bound(), t1)
             nt.assert_equals(dq.temporal_upper_bound(), t2)
 
-        # Check setting it again
-        (t1, t2) = test_bounds[-1]
-        dq.set_temporal_bounds(t1, t2)
-        nt.assert_equals(dq.temporal_lower_bound(), t1,
-            "Failed to set lower bound to same value")
-        nt.assert_equals(dq.temporal_upper_bound(), t2,
-            "Failed to set upper bound to same value")
-
 
     @nt.raises(RuntimeError)
     def test_bad_set_bounds_logic_error(self):
         dq = self._create_database_query()
         dq.set_temporal_bounds(Timestamp(200, 2), Timestamp(100, 1))
-
-
 
     @nt.raises(TypeError)
     def test_bad_set_bounds(self):
