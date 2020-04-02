@@ -285,6 +285,7 @@ class TestVitalTrackDescriptorAndHistoryEntry(object):
     def test_has_descriptor(self):
         tds = self._create_track_descriptors()
         for td in tds:
+            nt.assert_false(td.has_descriptor())
             td.resize_descriptor(5)
             nt.assert_true(td.has_descriptor())
 

@@ -32,7 +32,6 @@
 
 #include <sstream>
 
-
 namespace kwiver {
 namespace vital {
 
@@ -218,7 +217,7 @@ bool
 track_descriptor
 ::has_descriptor() const
 {
-  return this->data_->size() != 0;
+  return (this->data_ && this->data_->size());
 }
 
 
