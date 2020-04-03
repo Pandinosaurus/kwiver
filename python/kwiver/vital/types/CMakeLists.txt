@@ -212,6 +212,13 @@ target_link_libraries(python-vital.types-track_set
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(transform_2d
+  vital/types
+  transform_2d.cxx)
+target_link_libraries(python-vital.types-transform_2d
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(uid
   vital/types
   uid.cxx)
@@ -253,6 +260,7 @@ if(NOT SKBUILD)
     track
     track_descriptor
     track_set
+    transform_2d
     uid
     object_track_set
     activity_types

@@ -25,6 +25,7 @@ from kwiver.vital.types.timestamp import *
 from kwiver.vital.types.track import *
 from kwiver.vital.types.track_descriptor import *
 from kwiver.vital.types.track_set import *
+from kwiver.vital.types.transform_2d import *
 from kwiver.vital.types.uid import *
 from kwiver.vital.types.object_track_set import *
 from kwiver.vital.types.activity_types import *
