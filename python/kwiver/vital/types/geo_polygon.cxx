@@ -59,7 +59,4 @@ PYBIND11_MODULE(geo_polygon, m)
     return res.str();
   })
   ;
-
-  m.def("config_block_get_value_cast", &kv::config_block_get_value_cast<kv::config_block_value_t>);
-  m.def("config_block_set_value_cast", &kv::config_block_set_value_cast<kv::geo_polygon>);
 }
