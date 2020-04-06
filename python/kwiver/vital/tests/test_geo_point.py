@@ -181,6 +181,7 @@ class TestVitalGeoPolygon(object):
         nt.assert_equals(str(p1), "geo_point\n[ empty ]")
         print("empty geo_point to string:", str(p1), sep='\n')
 
+    # Also make sure the doubles roundtrip
     def test_to_str(self):
         x_in =  111.456789012345678
         y_in = -999.456789012345678
