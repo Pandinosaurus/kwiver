@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from kwiver.vital.types.types import *
+from kwiver.vital.types.activity_types import *
 from kwiver.vital.types.bounding_box import *
 from kwiver.vital.types.camera import *
 from kwiver.vital.types.camera_intrinsics import *
@@ -18,6 +19,7 @@ from kwiver.vital.types.geodesy import *
 from kwiver.vital.types.geo_polygon import *
 from kwiver.vital.types.homography import *
 from kwiver.vital.types.landmark import *
+from kwiver.vital.types.object_track_set import *
 from kwiver.vital.types.polygon import *
 from kwiver.vital.types.rotation import *
 from kwiver.vital.types.similarity import *
@@ -27,5 +29,3 @@ from kwiver.vital.types.track_descriptor import *
 from kwiver.vital.types.track_set import *
 from kwiver.vital.types.transform_2d import *
 from kwiver.vital.types.uid import *
-from kwiver.vital.types.object_track_set import *
-from kwiver.vital.types.activity_types import *
