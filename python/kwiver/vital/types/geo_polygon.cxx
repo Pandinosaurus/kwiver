@@ -53,7 +53,8 @@ PYBIND11_MODULE(geo_polygon, m)
   .def("crs", &kv::geo_polygon::crs)
   .def("set_polygon", &kv::geo_polygon::set_polygon)
   .def("is_empty", &kv::geo_polygon::is_empty)
-  .def("__str__", [](const kv::geo_polygon& self) {
+  .def("__str__", [](const kv::geo_polygon& self)
+  {
     std::stringstream res;
     res << self;
     return res.str();
