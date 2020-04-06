@@ -185,8 +185,8 @@ class TestVitalGeoPolygon(object):
 
     # Also make sure the doubles roundtrip
     def test_to_str(self):
-        x_in =  111.456789012345678
-        y_in = -999.456789012345678
+        x_in = 12.3456789012345678
+        y_in = -12.3456789012345678
         p1 = gp.GeoPoint(np.array([x_in, y_in]), self.crs_ll)
 
         split_str = str(p1).split()
