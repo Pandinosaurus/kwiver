@@ -196,12 +196,12 @@ class TestVitalGeoPolygon(object):
         # Parsing x
         coord_out, comma = split_str[2][:-1], split_str[2][-1]
         nt.assert_equals(comma, ",")
-        np.testing.assert_almost_equal(float(coord_out), x_in, 15)
+        np.testing.assert_almost_equal(float(coord_out), x_in, decimal=15)
 
         # Parsing y
         coord_out, comma = split_str[3][:-1], split_str[3][-1]
         nt.assert_equals(comma, ",")
-        np.testing.assert_almost_equal(float(coord_out), y_in, 15)
+        np.testing.assert_almost_equal(float(coord_out), y_in, decimal=15)
 
         # Altitude (0)
         coord_out = split_str[4]
