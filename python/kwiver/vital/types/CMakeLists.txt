@@ -134,6 +134,13 @@ target_link_libraries(python-vital.types-geodesy
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(geo_point
+  vital/types
+  geo_point.cxx)
+target_link_libraries(python-vital.types-geo_point
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(geo_polygon
   vital/types
   geo_polygon.cxx)
@@ -251,6 +258,7 @@ if(NOT SKBUILD)
     feature
     geodesy
     geo_polygon
+    geo_point
     homography
     landmark
     polygon
