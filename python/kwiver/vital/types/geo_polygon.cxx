@@ -31,12 +31,11 @@
 
 #include <vital/types/geo_polygon.h>
 
+#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
-// #include <pybind11/stl.h> TODO
-// #include <pybind11/eigen.h> TODO
+#include <pybind11/stl.h>
+
 #include <sstream>
-
-
 #include <memory>
 
 namespace py=pybind11;
