@@ -44,7 +44,10 @@ from kwiver.vital.types import (
     CameraIntrinsics,
     CameraMap,
     Feature,
+    geodesy,
+    GeoPolygon,
     Landmark,
+    Polygon,
     Rotation,
     Track,
     TrackSet,
@@ -207,3 +210,14 @@ def map_dtype_name_to_pixel_type(dtype_name):
     else:
         want = dtype_name
     return want
+
+# Creates a geo_polygon with the provided pts and crs
+# Default uses many decimal places to test double roundtrips
+def create_geo_poly(crs=geodesy.SRID.lat_lon_NAD83, pts=None):
+    if pts is None:
+        loc1 = np.array([-77.397577193572642, 38.17996907564275])
+        loc2 = np.array([-77.329127515765311, 38.18134786411568])
+        loc3 = np.array([-77.327408991847565, 38.12731304379414])
+        loc4 = np.array([-77.395808248573299, 38.12593882643528])
+        pts = [loc1, loc2, loc3, loc4]
+    return GeoPolygon(Polygon(pts), crs)
