@@ -30,6 +30,7 @@ set(__testable_modnames
   test_timestamp
   test_track
   test_track_descriptor
+  test_track_interval
   test_track_set
   test_track_state
   test_transform_2d

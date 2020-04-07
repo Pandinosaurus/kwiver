@@ -212,6 +212,13 @@ target_link_libraries(python-vital.types-track_descriptor
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(track_interval
+  vital/types
+  track_interval.cxx)
+target_link_libraries(python-vital.types-track_interval
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(track_set
   vital/types
   track_set.cxx)
@@ -267,6 +274,7 @@ if(NOT SKBUILD)
     timestamp
     track
     track_descriptor
+    track_interval
     track_set
     transform_2d
     uid
