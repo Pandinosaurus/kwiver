@@ -24,6 +24,7 @@ set(__testable_modnames
   test_landmark
   test_object_track_state
   test_object_track_set
+  test_query_result
   test_rotation
   test_polygon
   test_similarity

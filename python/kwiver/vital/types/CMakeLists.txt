@@ -177,6 +177,13 @@ target_link_libraries(python-vital.types-polygon
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(query_result
+  vital/types
+  query_result.cxx)
+target_link_libraries(python-vital.types-query_result
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(rotation
   vital/types
   rotation.cxx)
@@ -269,6 +276,7 @@ if(NOT SKBUILD)
     homography
     landmark
     polygon
+    query_result
     rotation
     similarity
     timestamp

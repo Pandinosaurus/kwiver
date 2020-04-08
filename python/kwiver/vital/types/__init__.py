@@ -22,6 +22,7 @@ from kwiver.vital.types.homography import *
 from kwiver.vital.types.landmark import *
 from kwiver.vital.types.object_track_set import *
 from kwiver.vital.types.polygon import *
+from kwiver.vital.types.query_result import *
 from kwiver.vital.types.rotation import *
 from kwiver.vital.types.similarity import *
 from kwiver.vital.types.timestamp import *
