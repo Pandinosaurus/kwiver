@@ -38,9 +38,9 @@
 namespace py=pybind11;
 namespace kv=kwiver::vital;
 
-// Note that this is unlike database_query::set_descriptors.
+// Note that this is unlike database_query::descriptors().
 // This returns a copy of the track_descriptor_set, while
-// database_query::set_descriptors returns a pointer to
+// database_query::descriptors() returns a pointer to
 // the internal track_descriptor_set. The returned set cannot
 //  be used to modify by reference
 kv::track_descriptor_set
@@ -54,12 +54,15 @@ database_query_get_descriptors(const kv::database_query& self)
   return *descs_sptr;
 }
 
+// Pybind wont allow track_descriptor_sets to be passed around with smart_pointers
+// We'll make a smart_ptr to a copy of the track_descriptor_set passed in
 void
 database_query_set_descriptors(kv::database_query& self, const kv::track_descriptor_set& tdset)
 {
+  // Note that we're making a copy of a vector of pointers.
+  // Elements of the vector can still be modified by reference on the python side
   self.set_descriptors(kv::track_descriptor_set_sptr(new kv::track_descriptor_set(tdset)));
 }
-
 
 PYBIND11_MODULE(database_query, m)
 {

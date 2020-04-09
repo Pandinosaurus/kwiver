@@ -50,6 +50,7 @@ from kwiver.vital.types import (
     Polygon,
     Rotation,
     Track,
+    track_descriptor,
     TrackSet,
     TrackState,
 )
@@ -210,6 +211,25 @@ def map_dtype_name_to_pixel_type(dtype_name):
     else:
         want = dtype_name
     return want
+
+
+# Just gets a list of num_desc track_descriptors, each with td_size random entries
+# Returns a track_descriptor_set and a copy of the lists used to set each track_descriptor
+def create_track_descriptor_set(td_size=5, num_desc=3):
+    ret_track_descriptor_set = []
+    lists_used = []
+    for i in range(num_desc):
+        l = np.random.uniform(low=0.0, high=1000, size=td_size)
+        td = track_descriptor.TrackDescriptor.create("td" + str(i))
+        td.resize_descriptor(td_size)
+        for j in range(td_size):
+            td[j] = l[j]
+        ret_track_descriptor_set.append(td)
+        lists_used.append(l)
+    return (ret_track_descriptor_set, lists_used)
+
+
+
 
 # Creates a geo_polygon with the provided pts and crs
 # Default uses many decimal places to test double roundtrips
