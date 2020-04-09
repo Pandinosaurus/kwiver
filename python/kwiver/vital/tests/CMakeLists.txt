@@ -13,6 +13,7 @@ set(__testable_modnames
   test_covariance
   test_database_query
   test_descriptor
+  test_descriptor_request
   test_descriptor_set
   test_feature
   test_geo_point

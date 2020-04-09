@@ -92,6 +92,13 @@ target_link_libraries(python-vital.types-descriptor
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(descriptor_request
+  vital/types
+  descriptor_request.cxx)
+target_link_libraries(python-vital.types-descriptor_request
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(descriptor_set
   vital/types
   descriptor_set.cxx)
@@ -272,6 +279,7 @@ if(NOT SKBUILD)
     covariance
     database_query
     descriptor
+    descriptor_request
     descriptor_set
     detected_object_type
     detected_object
