@@ -162,6 +162,13 @@ target_link_libraries(python-vital.types-homography_f2f
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(iqr_feedback
+  vital/types
+  iqr_feedback.cxx)
+target_link_libraries(python-vital.types-iqr_feedback
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(landmark
   vital/types
   landmark.cxx)
@@ -274,6 +281,7 @@ if(NOT SKBUILD)
     geo_polygon
     geo_point
     homography
+    iqr_feedback
     landmark
     polygon
     query_result
