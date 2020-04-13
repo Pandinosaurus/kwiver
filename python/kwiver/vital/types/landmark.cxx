@@ -30,7 +30,7 @@
 
 #include <vital/types/landmark.h>
 
-#include "covariance_class.cxx"
+#include "covariance.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>

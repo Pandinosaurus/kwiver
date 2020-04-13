@@ -34,7 +34,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
-#include "covariance_class.cxx"
+#include "covariance.h"
 #include "rotation_class.cxx"
 
 namespace py = pybind11;

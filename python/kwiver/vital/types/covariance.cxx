@@ -31,9 +31,99 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
-#include "covariance_class.cxx"
+#include "covariance.h"
 
 namespace py = pybind11;
+
+
+// Unfortunately, because pybind11 can't deal with templates, we have to enumerate
+// all the possibilities. But by handling it at construction time, we don't need
+// to worry about this later.
+std::shared_ptr<PyCovarianceBase>
+PyCovarianceBase::
+covar_from_scalar(int N, char c_type, py::object init)
+{
+  std::shared_ptr<PyCovarianceBase> retVal;
+  if(N == 2 && c_type == 'd')
+  {
+    if(!init.is(py::none()))
+    {
+      double mat = init.cast< double >();
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2d(mat));
+    }
+    else
+    {
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2d());
+    }
+  }
+  else if(N == 3 && c_type == 'd')
+  {
+    if(!init.is(py::none()))
+    {
+      double mat = init.cast< double >();
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3d(mat));
+    }
+    else
+    {
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3d());
+    }
+  }
+  else if(N == 2 && c_type == 'f')
+  {
+    if(!init.is(py::none()))
+    {
+      float mat = init.cast< float >();
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2f(mat));
+    }
+    else
+    {
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2f());
+    }
+  }
+  else if(N == 3 && c_type == 'f')
+  {
+    if(!init.is(py::none()))
+    {
+      float mat = init.cast< float >();
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3f(mat));
+    }
+    else
+    {
+      retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3f());
+    }
+  }
+  return retVal;
+}
+
+std::shared_ptr<PyCovarianceBase>
+PyCovarianceBase::
+covar_from_matrix(int N, char c_type, py::object init)
+{
+  std::shared_ptr<PyCovarianceBase> retVal;
+  if(N == 2 && c_type == 'd')
+  {
+    Eigen::Matrix< double, 2, 2 > mat = init.cast< Eigen::Matrix< double, 2, 2 > >();
+    retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2d(mat));
+  }
+  else if(N == 3 && c_type == 'd')
+  {
+    Eigen::Matrix< double, 3, 3 > mat = init.cast< Eigen::Matrix< double, 3, 3 > >();
+    retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3d(mat));
+  }
+  else if(N == 2 && c_type == 'f')
+  {
+    Eigen::Matrix< float, 2, 2 > mat = init.cast< Eigen::Matrix< float, 2, 2 > >();
+    retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance2f(mat));
+  }
+  else if(N == 3 && c_type == 'f')
+  {
+    Eigen::Matrix< float, 3, 3 > mat = init.cast< Eigen::Matrix< float, 3, 3 > >();
+    retVal = std::shared_ptr<PyCovarianceBase>(new PyCovariance3f(mat));
+  }
+  return retVal;
+}
+
+
 
 PYBIND11_MODULE(covariance, m)
 {
@@ -58,5 +148,4 @@ PYBIND11_MODULE(covariance, m)
   py::class_<PyCovariance2f, std::shared_ptr<PyCovariance2f>, PyCovarianceBase>(m, "Covar2f");
   py::class_<PyCovariance3d, std::shared_ptr<PyCovariance3d>, PyCovarianceBase>(m, "Covar3d");
   py::class_<PyCovariance3f, std::shared_ptr<PyCovariance3f>, PyCovarianceBase>(m, "Covar3f");
-
 }
