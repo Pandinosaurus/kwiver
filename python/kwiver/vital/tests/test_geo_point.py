@@ -185,9 +185,9 @@ class TestVitalGeoPoint(object):
 
     # Also make sure the doubles roundtrip
     def test_to_str(self):
-        x_in = 12.3456789012345678
-        y_in = -12.3456789012345678
-        p1 = gp.GeoPoint(np.array([x_in, y_in]), self.crs_ll)
+        easting_in = 12.3456789012345678
+        northing_in = -12.3456789012345678
+        p1 = gp.GeoPoint(np.array([easting_in, northing_in]), self.crs_ll)
 
         split_str = str(p1).split()
 
@@ -195,19 +195,19 @@ class TestVitalGeoPoint(object):
         nt.assert_equals(split_str[0], "geo_point")
         nt.assert_equals(split_str[1], "[")
 
-        # Parsing x
-        coord_out, comma = split_str[2][:-1], split_str[2][-1]
+        # Parsing easting
+        easting_out, comma = split_str[2][:-1], split_str[2][-1]
         nt.assert_equals(comma, ",")
-        np.testing.assert_almost_equal(float(coord_out), x_in, decimal=15)
+        np.testing.assert_almost_equal(float(easting_out), easting_in, decimal=15)
 
-        # Parsing y
-        coord_out, comma = split_str[3][:-1], split_str[3][-1]
+        # Parsing northing
+        northing_out, comma = split_str[3][:-1], split_str[3][-1]
         nt.assert_equals(comma, ",")
-        np.testing.assert_almost_equal(float(coord_out), y_in, decimal=15)
+        np.testing.assert_almost_equal(float(northing_out), northing_in, decimal=15)
 
         # Altitude (0)
-        coord_out = split_str[4]
-        nt.assert_almost_equal(float(coord_out), 0)
+        altitude_out = split_str[4]
+        nt.assert_almost_equal(float(altitude_out), 0)
 
         nt.assert_equals(split_str[5], "]")
         nt.assert_equals(split_str[6], "@")
