@@ -142,6 +142,13 @@ target_link_libraries(python-vital.types-geodesy
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(geo_covariance
+  vital/types
+  geo_covariance.cxx)
+target_link_libraries(python-vital.types-geo_covariance
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(geo_point
   vital/types
   geo_point.cxx)
@@ -287,6 +294,7 @@ if(NOT SKBUILD)
     detected_object_set
     feature
     geodesy
+    geo_covariance
     geo_polygon
     geo_point
     homography
