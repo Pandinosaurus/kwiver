@@ -16,6 +16,7 @@ set(__testable_modnames
   test_descriptor_request
   test_descriptor_set
   test_feature
+  test_feature_set
   test_geo_covariance
   test_geo_point
   test_geo_polygon

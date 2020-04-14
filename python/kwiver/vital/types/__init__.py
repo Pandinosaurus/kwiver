@@ -16,6 +16,7 @@ from kwiver.vital.types.detected_object_type import *
 from kwiver.vital.types.detected_object import *
 from kwiver.vital.types.detected_object_set import *
 from kwiver.vital.types.feature import *
+from kwiver.vital.types.feature_set import *
 from kwiver.vital.types.geodesy import *
 from kwiver.vital.types.geo_covariance import *
 from kwiver.vital.types.geo_point import *

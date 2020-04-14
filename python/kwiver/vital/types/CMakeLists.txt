@@ -135,6 +135,13 @@ target_link_libraries(python-vital.types-feature
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(feature_set
+  vital/types
+  feature_set.cxx)
+target_link_libraries(python-vital.types-feature_set
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(geodesy
   vital/types
   geodesy.cxx)
@@ -293,6 +300,7 @@ if(NOT SKBUILD)
     detected_object
     detected_object_set
     feature
+    feature_set
     geodesy
     geo_covariance
     geo_polygon
