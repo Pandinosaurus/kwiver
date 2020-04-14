@@ -30,12 +30,15 @@
 
 #include <vital/types/feature.h>
 
-#include "covariance.h"
+#include <python/kwiver/vital/types/covariance.h>
+#include <python/kwiver/vital/util/pybind11.h>
+
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
 namespace py=pybind11;
+namespace kv=kwiver::vital;
 
 // TODO
 // We don't actually need all this extra crap, I wrote this class
@@ -215,18 +218,170 @@ new_feature(py::object loc_obj,
   return retVal;
 }
 
-PYBIND11_MODULE(feature, m)
+
+//////////////////////////////////////////////////////////////////
+
+// TODO: trampoline for derived classes?
+// TODO: get/set covar in trampolines
+
+template < class abstract_feature = kv::feature >
+  class feature_trampoline
+  : public abstract_feature
+  {
+    //Inherit constructors
+    using abstract_feature::abstract_feature;
+
+    std::type_info const& data_type() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(std::type_info const&, abstract_feature, data_type,);
+    }
+
+    kv::vector_2d loc() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(kv::vector_2d, abstract_feature, loc,);
+    }
+
+    double magnitude() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(double, abstract_feature, magnitude,);
+    }
+
+    double scale() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(double, abstract_feature, scale,);
+    }
+
+    double angle() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(double, abstract_feature, angle,);
+    }
+
+    kv::covariance_2d covar() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(kv::covariance_2d, abstract_feature, covar,);
+    }
+
+    kv::rgb_color color() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(kv::rgb_color, abstract_feature, color,);
+    }
+
+    kv::feature_sptr clone() const override
+    {
+      VITAL_PYBIND11_OVERLOAD_PURE(kv::feature_sptr, abstract_feature, clone,);
+    }
+  };
+
+  template < class concrete_feature >
+  class concrete_feature_trampoline
+  : public concrete_feature
+  {
+    //Inherit constructors
+    using concrete_feature::concrete_feature;
+
+    std::type_info const& data_type() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(std::type_info const&, concrete_feature, data_type,);
+    }
+
+    kv::vector_2d loc() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(kv::vector_2d, concrete_feature, loc,);
+    }
+
+    double magnitude() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(double, concrete_feature, magnitude,);
+    }
+
+    double scale() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(double, concrete_feature, scale,);
+    }
+
+    double angle() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(double, concrete_feature, angle,);
+    }
+
+    kv::covariance_2d covar() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(kv::covariance_2d, concrete_feature, covar,);
+    }
+
+    kv::rgb_color color() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(kv::rgb_color, concrete_feature, color,);
+    }
+
+    kv::feature_sptr clone() const override
+    {
+      VITAL_PYBIND11_OVERLOAD(kv::feature_sptr, concrete_feature, clone,);
+    }
+  };
+
+// Easy way to automate bindings of templated classes.
+// For more information, see below link
+// https://stackoverflow.com/questions/47487888/pybind11-template-class-of-many-types
+template< typename T >
+void declare_feature( py::module &m, std::string const& typestr )
 {
-  py::class_<PyFeatureBase, std::shared_ptr<PyFeatureBase>>(m, "Feature")
-  .def(py::init(&new_feature),
-    py::arg("loc")=py::none(), py::arg("mag")=0., py::arg("scale")=1.,
-    py::arg("angle")=0., py::arg("rgb_color")=kwiver::vital::rgb_color(), py::arg("ctype")='d')
-  .def_property_readonly("type_name", &PyFeatureBase::get_type)
-  .def_property("location", &PyFeatureBase::get_loc, &PyFeatureBase::set_loc)
-  .def_property("magnitude", &PyFeatureBase::get_mag, &PyFeatureBase::set_mag)
-  .def_property("scale", &PyFeatureBase::get_scale, &PyFeatureBase::set_scale)
-  .def_property("angle", &PyFeatureBase::get_angle, &PyFeatureBase::set_angle)
-  .def_property("covariance", &PyFeatureBase::get_covar, &PyFeatureBase::set_covar)
-  .def_property("color", &PyFeatureBase::get_color, &PyFeatureBase::set_color)
+  using Class = kv::feature_< T >;
+  const std::string pyclass_name = std::string( "Feature" ) + typestr;
+
+  py::class_< Class,
+              std::shared_ptr< Class >,
+              kv::feature,
+              concrete_feature_trampoline< Class > >( m, pyclass_name.c_str() )
+  .def( py::init<>() )
+  .def( py::init< Eigen::Matrix< T, 2, 1 > const&, T, T, T, kv::rgb_color const& >(),
+    py::arg( "loc" ), py::arg( "mag" ) = 0.0, py::arg( "scale" ) = 1.0,
+    py::arg( "angle" ) = 0.0, py::arg( "color" ) = kv::rgb_color() )
+
+  // Keep getters and setters separate to allow for
+  // overriding base feature methods
+  .def( "get_loc",   &Class::get_loc )
+  .def( "get_mag",   &Class::get_magnitude )
+  .def( "get_scale", &Class::get_scale )
+  .def( "get_angle", &Class::get_angle )
+  // .def( "get_covar", &Class::get_covar )
+  .def( "get_color", &Class::get_color )
+
+  .def( "set_loc",   &Class::set_loc )
+  .def( "set_mag",   &Class::set_magnitude )
+  .def( "set_scale", &Class::set_scale )
+  .def( "set_angle", &Class::set_angle )
+  // .def( "set_covar", &Class::set_covar )
+  .def( "set_color", &Class::set_color )
   ;
+}
+
+PYBIND11_MODULE( feature, m )
+{
+  py::class_< kv::feature, std::shared_ptr< kv::feature >, feature_trampoline<> >( m, "Feature" )
+  .def( py::init<>() )
+  .def( "data_type", [] ( const kv::feature& self ) { return self.data_type().name(); })
+  .def( "loc",       &kv::feature::loc )
+  .def( "magnitude", &kv::feature::magnitude )
+  .def( "scale",     &kv::feature::scale )
+  .def( "angle",     &kv::feature::angle )
+  // .def( "covar",     &kv::feature::covar )
+  .def( "color",     &kv::feature::color )
+  .def( "clone",     &kv::feature::clone )
+
+  .def( "__eq__", [] ( const kv::feature& self, const kv::feature& other )
+    {
+      return self == other;
+    })
+  .def( "equal_except_for_angle", [] ( const kv::feature& self, const kv::feature& other )
+    {
+      return self.equal_except_for_angle( other );
+    })
+  .def( "__ne__", [] ( const kv::feature& self, const kv::feature& other )
+    {
+      return self != other;
+    })
+  ;
+  declare_feature< float  >( m, "F" );
+  declare_feature< double >( m, "D" );
 }
