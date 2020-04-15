@@ -73,7 +73,6 @@ target_link_libraries(python-vital.types-color
 
 kwiver_add_python_library(covariance
   vital/types
-  covariance.h
   covariance.cxx)
 target_link_libraries(python-vital.types-covariance
   PUBLIC ${PYTHON_LIBRARIES}

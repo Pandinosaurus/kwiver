@@ -30,8 +30,6 @@
 
 #include <vital/types/landmark.h>
 
-#include "covariance.h"
-
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
@@ -110,12 +108,12 @@ class PyLandmarkd
 
     py::object get_covariance()
             {
-              return py::cast<PyCovariance3d>(PyCovariance3d(landmark.get_covar()));
+              return py::cast<kwiver::vital::covariance_3d>(landmark.get_covar());
             };
     void set_covariance(py::object covar_obj)
             {
-              PyCovariance3d covar = covar_obj.cast<PyCovariance3d>();
-              landmark.set_covar(covar.get_covar());
+              kwiver::vital::covariance_3d covar = covar_obj.cast<kwiver::vital::covariance_3d>();
+              landmark.set_covar(covar);
             };
 
     kwiver::vital::rgb_color get_color() { return landmark.get_color(); };
@@ -171,12 +169,12 @@ class PyLandmarkf
 
     py::object get_covariance()
             {
-              return py::cast<PyCovariance3f>(PyCovariance3f(landmark.get_covar()));
+              return py::cast<kwiver::vital::covariance_3f>(landmark.get_covar());
             };
     void set_covariance(py::object covar_obj)
             {
-              PyCovariance3f covar = covar_obj.cast<PyCovariance3f>();
-              landmark.set_covar(covar.get_covar());
+              kwiver::vital::covariance_3f covar = covar_obj.cast<kwiver::vital::covariance_3f>();
+              landmark.set_covar(covar);
             };
 
     kwiver::vital::rgb_color get_color() { return landmark.get_color(); };

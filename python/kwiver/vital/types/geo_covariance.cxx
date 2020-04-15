@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <python/kwiver/vital/types/covariance.h>
 #include <vital/types/geo_covariance.h>
 
 #include <pybind11/eigen.h>
@@ -39,19 +38,6 @@
 
 namespace py=pybind11;
 namespace kv=kwiver::vital;
-
-std::shared_ptr< PyCovariance3f >
-geo_covariance_get_covariance( kv::geo_covariance& self )
-{
-  // Make a shared_ptr to a new PyCovariance3f
-  return std::make_shared< PyCovariance3f >( self.covariance() );
-}
-
-void geo_covariance_set_covariance( kv::geo_covariance& self,
-                                    std::shared_ptr<PyCovariance3f> py_covar )
-{
-  self.set_covariance( py_covar->get_covar() );
-}
 
 PYBIND11_MODULE( geo_covariance, m )
 {
@@ -64,7 +50,7 @@ PYBIND11_MODULE( geo_covariance, m )
   .def( py::init<>() )
   .def( py::init< kv::geo_point::geo_2d_point_t const&, int >() )
   .def( py::init< kv::geo_point::geo_3d_point_t const&, int >() )
-  .def_property( "covariance", &geo_covariance_get_covariance, &geo_covariance_set_covariance )
+  .def_property( "covariance", &kv::geo_covariance::covariance, &kv::geo_covariance::set_covariance )
   .def( "__str__", [] ( const kv::geo_covariance& self )
   {
     std::stringstream res;

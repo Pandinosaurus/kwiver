@@ -34,7 +34,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
-#include "covariance.h"
 #include "rotation_class.cxx"
 
 namespace py = pybind11;
@@ -107,14 +106,8 @@ PYBIND11_MODULE(camera, m)
                                 })
   .def_property("center", &kwiver::vital::simple_camera_perspective::center,
                           &kwiver::vital::simple_camera_perspective::set_center)
-  .def_property("covariance", [](kwiver::vital::simple_camera_perspective &self)
-                                {
-                                  return PyCovariance3d(self.get_center_covar().matrix());
-                                },
-                              [](kwiver::vital::simple_camera_perspective &self, PyCovariance3d val)
-                                {
-                                  self.set_center_covar(val.get_covar());
-                                })
+  .def_property("covariance", &kwiver::vital::simple_camera_perspective::get_center_covar,
+                              &kwiver::vital::simple_camera_perspective::set_center_covar)
   .def_property("translation", &kwiver::vital::simple_camera_perspective::translation,
                                &kwiver::vital::simple_camera_perspective::set_translation)
   .def_property("rotation", [](kwiver::vital::simple_camera_perspective &self)
