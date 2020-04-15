@@ -39,7 +39,7 @@ import unittest
 import nose.tools
 import numpy
 
-from kwiver.vital.types import Landmark, Covariance, RGBColor
+from kwiver.vital.types import Landmark, Covar3f, Covar3d, RGBColor
 
 
 class TestLandmark (unittest.TestCase):
@@ -135,17 +135,17 @@ class TestLandmark (unittest.TestCase):
             numpy.testing.assert_equal(l.normal, [0,1,0])
 
     def test_covariance(self):
-        for ct in self.ctypeS:
+        covars = [Covar3d(7), Covar3f(7)]
+        for ct, covar in zip(self.ctypeS, covars):
             print(ct)
             l = Landmark(ctype=ct)
 
             # check default
-            #nose.tools.assert_equal(l.covariance, Covariance.new_covar(3))
+            #nose.tools.assert_equal(l.covariance, Covar3d())
 
             # set type-aligned covariance
-            c = Covariance.new_covar(3, ct, 7)
-            l.covariance = c
-            #nose.tools.assert_equal(l.covariance, c)
+            l.covariance = covar
+            #nose.tools.assert_equal(l.covariance, covar)
 
     def test_color(self):
         for ct in self.ctypeS:

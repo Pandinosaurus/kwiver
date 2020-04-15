@@ -37,7 +37,7 @@
 import nose.tools as nt
 import numpy as np
 
-from kwiver.vital.types import Covariance, GeoCovariance, geodesy, GeoPoint
+from kwiver.vital.types import Covar3f, GeoCovariance, geodesy, GeoPoint
 from kwiver.vital.modules import modules
 
 
@@ -71,25 +71,25 @@ class TestVitalGeoCovariance(object):
         gcs = self._create_geo_covar()
 
         for gc in gcs:
-            c = Covariance.new_covar(3, "f")
+            c = Covar3f()
             gc.covariance = c
-            mat_in = c.to_matrix()
-            mat_out = gc.covariance.to_matrix()
+            mat_in = c.matrix()
+            mat_out = gc.covariance.matrix()
             np.testing.assert_array_equal(mat_in, mat_out)
 
-            c = Covariance.new_covar(3, "f", -5.5)
+            c = Covar3f(-5.5)
             gc.covariance = c
-            mat_in = c.to_matrix()
-            mat_out = gc.covariance.to_matrix()
+            mat_in = c.matrix()
+            mat_out = gc.covariance.matrix()
             np.testing.assert_array_almost_equal(mat_in, mat_out)
 
             # Generate 3x3 matrix of floats between -5 and 5
             mat_in = np.ndarray((3, 3))
             mat_in[:] = 5
-            c = Covariance.from_matrix(3, "f", mat_in)
+            c = Covar3f(mat_in)
             gc.covariance = c
-            mat_out = gc.covariance.to_matrix()
-            np.testing.assert_array_almost_equal(mat_in, c.to_matrix())
+            mat_out = gc.covariance.matrix()
+            np.testing.assert_array_almost_equal(mat_in, c.matrix())
 
     def test_inheritance(self):
         gcs = self._create_geo_covar()

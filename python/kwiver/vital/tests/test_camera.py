@@ -98,7 +98,7 @@ class TestVitalCamera (unittest.TestCase):
         cam = Camera()
         # Should be default value of an identity matrix
         np.testing.assert_array_equal(
-            cam.covariance.to_matrix(),
+            cam.covariance.matrix(),
             np.eye(3),
         )
 

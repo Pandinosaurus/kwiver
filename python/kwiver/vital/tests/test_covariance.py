@@ -39,76 +39,76 @@ import unittest
 import nose.tools
 import numpy as np
 
-from kwiver.vital.types import Covariance
+from kwiver.vital.types import Covar2f, Covar2d, Covar3f, Covar3d
 
-class TestVitalCovariance (unittest.TestCase):
 
+class TestVitalCovariance(unittest.TestCase):
     def test_new_identity(self):
         # Valid dimensions and types
-        c = Covariance.new_covar(2, 'd')
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'd')
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(2, 'f')
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'f')
-        print('constructed matrix:\n', c.to_matrix())
+        c = Covar2d()
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3d()
+        print("constructed matrix:\n", c.matrix())
+        c = Covar2f()
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3f()
+        print("constructed matrix:\n", c.matrix())
 
     def test_new_scalar(self):
-        c = Covariance.new_covar(2, 'd', 2.)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'd', 2.)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(2, 'f', 2.)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'f', 2.)
-        print('constructed matrix:\n', c.to_matrix())
+        c = Covar2d(2.0)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3d(2.0)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar2f(2.0)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3f(2.0)
+        print("constructed matrix:\n", c.matrix())
 
-        c = Covariance.new_covar(2, 'd', 14.675)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'd', 14.675)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(2, 'f', 14.675)
-        print('constructed matrix:\n', c.to_matrix())
-        c = Covariance.new_covar(3, 'f', 14.675)
-        print('constructed matrix:\n', c.to_matrix())
+        c = Covar2d(14.675)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3d(14.675)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar2f(14.675)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar3f(14.675)
+        print("constructed matrix:\n", c.matrix())
 
     def test_new_matrix(self):
         m = np.array([[1, 1], [1, 1]])
-        c = Covariance.from_matrix(2, 'd', m)
-        m_out = c.to_matrix()
-        print('input matrix:\n', m)
-        print('output matrix:\n', m_out)
+        c = Covar2d(m)
+        m_out = c.matrix()
+        print("input matrix:\n", m)
+        print("output matrix:\n", m_out)
         np.testing.assert_array_equal(m_out, m)
 
         # Type casting should be handled
-        m = np.array([[1, 1], [1, 1]], dtype = np.float32)
-        c = Covariance.from_matrix(2, 'd', m)
-        m_out = c.to_matrix()
-        print('input matrix:\n', m)
-        print('output matrix:\n', m_out)
+        m = np.array([[1, 1], [1, 1]], dtype=np.float32)
+        c = Covar2d(m)
+        m_out = c.matrix()
+        print("input matrix:\n", m)
+        print("output matrix:\n", m_out)
         np.testing.assert_array_equal(m_out, m)
 
         # Any other numpy array of the correct shape should be acceptable
         m = np.ndarray((2, 2))
-        m[:] = 3.
-        c = Covariance.from_matrix(2, 'f', init=m)
-        m_out = c.to_matrix()
-        print('input matrix:\n', m)
-        print('output matrix:\n', m_out)
+        m[:] = 3.0
+        c = Covar2f(m)
+        m_out = c.matrix()
+        print("input matrix:\n", m)
+        print("output matrix:\n", m_out)
         np.testing.assert_array_equal(m_out, m)
 
         # Diagonally congruent values should be averages when initializing with
         # matrix
         m = np.eye(3, dtype=np.double)
-        m[0,2] = 2.
+        m[0, 2] = 2.0
         m_expected = m.copy()
-        m_expected[0,2] = 1.
-        m_expected[2,0] = 1.
-        c = Covariance.from_matrix(3, init=m)
-        m_out = c.to_matrix()
-        print('input matrix:\n', m)
-        print('output matrix:\n', m_out)
+        m_expected[0, 2] = 1.0
+        m_expected[2, 0] = 1.0
+        c = Covar3d(m)
+        m_out = c.matrix()
+        print("input matrix:\n", m)
+        print("output matrix:\n", m_out)
         np.testing.assert_array_equal(m_out, m_expected)
 
     def test_get_value(self):
@@ -118,47 +118,41 @@ class TestVitalCovariance (unittest.TestCase):
         #  [ 6 7 8 ]]               [ 4 6 8 ]]
         m.reshape((9,))[:] = list(range(9))
 
-        c = Covariance.from_matrix(3, c_type='d', init=m)
+        c = Covar3d(m)
         # Test matrix upper triangle locations
-        nose.tools.assert_equal(c[0,0], 0)
-        nose.tools.assert_equal(c[0,1], 2)
-        nose.tools.assert_equal(c[0,2], 4)
-        nose.tools.assert_equal(c[1,1], 4)
-        nose.tools.assert_equal(c[1,2], 6)
-        nose.tools.assert_equal(c[2,2], 8)
-        nose.tools.assert_equal(c[0,1], c[1,0])
-        nose.tools.assert_equal(c[0,2], c[2,0])
-        nose.tools.assert_equal(c[1,2], c[2,1])
+        nose.tools.assert_equal(c[0, 0], 0)
+        nose.tools.assert_equal(c[0, 1], 2)
+        nose.tools.assert_equal(c[0, 2], 4)
+        nose.tools.assert_equal(c[1, 1], 4)
+        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[2, 2], 8)
+        nose.tools.assert_equal(c[0, 1], c[1, 0])
+        nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[1, 2], c[2, 1])
 
-        c = Covariance.from_matrix(3, c_type='f', init=m)
+        c = Covar3f(m)
         # Test matrix upper triangle locations
-        nose.tools.assert_equal(c[0,0], 0)
-        nose.tools.assert_equal(c[0,1], 2)
-        nose.tools.assert_equal(c[0,2], 4)
-        nose.tools.assert_equal(c[1,1], 4)
-        nose.tools.assert_equal(c[1,2], 6)
-        nose.tools.assert_equal(c[2,2], 8)
-        nose.tools.assert_equal(c[0,1], c[1,0])
-        nose.tools.assert_equal(c[0,2], c[2,0])
-        nose.tools.assert_equal(c[1,2], c[2,1])
+        nose.tools.assert_equal(c[0, 0], 0)
+        nose.tools.assert_equal(c[0, 1], 2)
+        nose.tools.assert_equal(c[0, 2], 4)
+        nose.tools.assert_equal(c[1, 1], 4)
+        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[2, 2], 8)
+        nose.tools.assert_equal(c[0, 1], c[1, 0])
+        nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[1, 2], c[2, 1])
 
     def test_get_oob(self):
         # 2x2 covariance mat
-        c = Covariance.new_covar(c_type='d')
+        c = Covar2d()
         _ = c[0, 0]  # Valid access
-        nose.tools.assert_raises(
-            IndexError,
-            c.__getitem__,
-            (0, 2)
-        )
+        nose.tools.assert_raises(IndexError, c.__getitem__, (0, 2))
+        nose.tools.assert_raises(IndexError, c.__getitem__, (-1, 0))
 
-        c = Covariance.new_covar(c_type='f')
+        c = Covar2f()
         _ = c[0, 0]  # Valid access
-        nose.tools.assert_raises(
-            IndexError,
-            c.__getitem__,
-            (0, 2)
-        )
+        nose.tools.assert_raises(IndexError, c.__getitem__, (0, 2))
+        nose.tools.assert_raises(IndexError, c.__getitem__, (-1, 0))
 
     def test_set(self):
         m = np.ndarray((3, 3))
@@ -166,21 +160,21 @@ class TestVitalCovariance (unittest.TestCase):
         #  [ 3 4 5 ]  -> should become ->  [ 2 4 6 ]
         #  [ 6 7 8 ]]                      [ 4 6 8 ]]
         m.reshape((9,))[:] = list(range(9))
-        c = Covariance.from_matrix(3, c_type='d', init=m)
+        c = Covar3d(m)
 
         # modify some locations
-        c[0,1] = 1
-        c[2,2] = 3
+        c[0, 1] = 1
+        c[2, 2] = 3
 
-        nose.tools.assert_equal(c[0,0], 0)
-        nose.tools.assert_equal(c[0,1], 1)
-        nose.tools.assert_equal(c[0,2], 4)
-        nose.tools.assert_equal(c[1,1], 4)
-        nose.tools.assert_equal(c[1,2], 6)
-        nose.tools.assert_equal(c[2,2], 3)
-        nose.tools.assert_equal(c[0,1], c[1,0])
-        nose.tools.assert_equal(c[0,2], c[2,0])
-        nose.tools.assert_equal(c[1,2], c[2,1])
+        nose.tools.assert_equal(c[0, 0], 0)
+        nose.tools.assert_equal(c[0, 1], 1)
+        nose.tools.assert_equal(c[0, 2], 4)
+        nose.tools.assert_equal(c[1, 1], 4)
+        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[2, 2], 3)
+        nose.tools.assert_equal(c[0, 1], c[1, 0])
+        nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[1, 2], c[2, 1])
 
         # Set in upper triangle and see it reflect in lower
         c[0, 2] = 10.1
@@ -191,21 +185,21 @@ class TestVitalCovariance (unittest.TestCase):
         nose.tools.assert_equal(c[1, 2], 20.2)
 
         # FLOAT
-        c = Covariance.from_matrix(3, c_type='f', init=m)
+        c = Covar3f(m)
 
         # modify some locations
-        c[0,1] = 1
-        c[2,2] = 3
+        c[0, 1] = 1
+        c[2, 2] = 3
 
-        nose.tools.assert_equal(c[0,0], 0)
-        nose.tools.assert_equal(c[0,1], 1)
-        nose.tools.assert_equal(c[0,2], 4)
-        nose.tools.assert_equal(c[1,1], 4)
-        nose.tools.assert_equal(c[1,2], 6)
-        nose.tools.assert_equal(c[2,2], 3)
-        nose.tools.assert_equal(c[0,1], c[1,0])
-        nose.tools.assert_equal(c[0,2], c[2,0])
-        nose.tools.assert_equal(c[1,2], c[2,1])
+        nose.tools.assert_equal(c[0, 0], 0)
+        nose.tools.assert_equal(c[0, 1], 1)
+        nose.tools.assert_equal(c[0, 2], 4)
+        nose.tools.assert_equal(c[1, 1], 4)
+        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[2, 2], 3)
+        nose.tools.assert_equal(c[0, 1], c[1, 0])
+        nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[1, 2], c[2, 1])
 
         # Set in upper triangle and see it reflect in lower
         c[0, 2] = 10.1
@@ -217,18 +211,12 @@ class TestVitalCovariance (unittest.TestCase):
 
     def test_set_oob(self):
         # 2x2 covariance mat
-        c = Covariance.new_covar(c_type='f')
+        c = Covar2f()
         c[0, 0] = 1  # Valid set
-        nose.tools.assert_raises(
-            IndexError,
-            c.__setitem__,
-            (0, 2), 1
-        )
+        nose.tools.assert_raises(IndexError, c.__setitem__, (0, 2), 1)
+        nose.tools.assert_raises(IndexError, c.__setitem__, (-1, 0), 1)
 
-        c = Covariance.new_covar(c_type='d')
+        c = Covar2d()
         c[0, 0] = 1  # Valid set
-        nose.tools.assert_raises(
-            IndexError,
-            c.__setitem__,
-            (0, 2), 1
-        )
+        nose.tools.assert_raises(IndexError, c.__setitem__, (0, 2), 1)
+        nose.tools.assert_raises(IndexError, c.__setitem__, (-1, 0), 1)
