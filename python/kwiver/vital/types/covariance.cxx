@@ -85,4 +85,6 @@ PYBIND11_MODULE(covariance, m)
   declare_covariance< 2, float  >( m, "2f" );
   declare_covariance< 3, double >( m, "3d" );
   declare_covariance< 3, float  >( m, "3f" );
+  declare_covariance< 4, double >( m, "4d" );
+  declare_covariance< 4, float  >( m, "4f" );
 }

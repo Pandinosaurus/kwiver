@@ -39,7 +39,7 @@ import unittest
 import nose.tools
 import numpy as np
 
-from kwiver.vital.types import Covar2f, Covar2d, Covar3f, Covar3d
+from kwiver.vital.types.covariance import *
 
 
 class TestVitalCovariance(unittest.TestCase):
@@ -49,9 +49,13 @@ class TestVitalCovariance(unittest.TestCase):
         print("constructed matrix:\n", c.matrix())
         c = Covar3d()
         print("constructed matrix:\n", c.matrix())
+        c = Covar4d()
+        print("constructed matrix:\n", c.matrix())
         c = Covar2f()
         print("constructed matrix:\n", c.matrix())
         c = Covar3f()
+        print("constructed matrix:\n", c.matrix())
+        c = Covar4f()
         print("constructed matrix:\n", c.matrix())
 
     def test_new_scalar(self):
@@ -59,18 +63,26 @@ class TestVitalCovariance(unittest.TestCase):
         print("constructed matrix:\n", c.matrix())
         c = Covar3d(2.0)
         print("constructed matrix:\n", c.matrix())
+        c = Covar4d(2.0)
+        print("constructed matrix:\n", c.matrix())
         c = Covar2f(2.0)
         print("constructed matrix:\n", c.matrix())
         c = Covar3f(2.0)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar4f(2.0)
         print("constructed matrix:\n", c.matrix())
 
         c = Covar2d(14.675)
         print("constructed matrix:\n", c.matrix())
         c = Covar3d(14.675)
         print("constructed matrix:\n", c.matrix())
+        c = Covar4d(14.675)
+        print("constructed matrix:\n", c.matrix())
         c = Covar2f(14.675)
         print("constructed matrix:\n", c.matrix())
         c = Covar3f(14.675)
+        print("constructed matrix:\n", c.matrix())
+        c = Covar4f(14.675)
         print("constructed matrix:\n", c.matrix())
 
     def test_new_matrix(self):
@@ -112,35 +124,52 @@ class TestVitalCovariance(unittest.TestCase):
         np.testing.assert_array_equal(m_out, m_expected)
 
     def test_get_value(self):
-        m = np.ndarray((3, 3))
-        # [[ 0 1 2 ]               [[ 0 2 4 ]
-        #  [ 3 4 5 ]  -> should ->  [ 2 4 6 ]
-        #  [ 6 7 8 ]]               [ 4 6 8 ]]
-        m.reshape((9,))[:] = list(range(9))
+        m = np.ndarray((4, 4))
+        # [[ 0  2  4  6  ]                [[ 0  5  10 15 ]
+        #  [ 8  10 12 14 ]  -> should ->   [ 5  10 15 20 ]
+        #  [ 16 18 20 22 ]                 [ 10 15 20 25 ]
+        #  [ 24 26 28 30 ]]                [ 15 20 25 30 ]]
+        m.reshape((16,))[:] = list(range(0, 32, 2))
 
-        c = Covar3d(m)
+        c = Covar4d(m)
         # Test matrix upper triangle locations
         nose.tools.assert_equal(c[0, 0], 0)
-        nose.tools.assert_equal(c[0, 1], 2)
-        nose.tools.assert_equal(c[0, 2], 4)
-        nose.tools.assert_equal(c[1, 1], 4)
-        nose.tools.assert_equal(c[1, 2], 6)
-        nose.tools.assert_equal(c[2, 2], 8)
+        nose.tools.assert_equal(c[0, 1], 5)
+        nose.tools.assert_equal(c[0, 2], 10)
+        nose.tools.assert_equal(c[0, 3], 15)
+        nose.tools.assert_equal(c[1, 1], 10)
+        nose.tools.assert_equal(c[1, 2], 15)
+        nose.tools.assert_equal(c[1, 3], 20)
+        nose.tools.assert_equal(c[2, 2], 20)
+        nose.tools.assert_equal(c[2, 3], 25)
+        nose.tools.assert_equal(c[3, 3], 30)
+
         nose.tools.assert_equal(c[0, 1], c[1, 0])
         nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[0, 3], c[3, 0])
         nose.tools.assert_equal(c[1, 2], c[2, 1])
+        nose.tools.assert_equal(c[1, 3], c[3, 1])
+        nose.tools.assert_equal(c[2, 3], c[3, 2])
 
-        c = Covar3f(m)
+        c = Covar4f(m)
         # Test matrix upper triangle locations
         nose.tools.assert_equal(c[0, 0], 0)
-        nose.tools.assert_equal(c[0, 1], 2)
-        nose.tools.assert_equal(c[0, 2], 4)
-        nose.tools.assert_equal(c[1, 1], 4)
-        nose.tools.assert_equal(c[1, 2], 6)
-        nose.tools.assert_equal(c[2, 2], 8)
+        nose.tools.assert_equal(c[0, 1], 5)
+        nose.tools.assert_equal(c[0, 2], 10)
+        nose.tools.assert_equal(c[0, 3], 15)
+        nose.tools.assert_equal(c[1, 1], 10)
+        nose.tools.assert_equal(c[1, 2], 15)
+        nose.tools.assert_equal(c[1, 3], 20)
+        nose.tools.assert_equal(c[2, 2], 20)
+        nose.tools.assert_equal(c[2, 3], 25)
+        nose.tools.assert_equal(c[3, 3], 30)
+
         nose.tools.assert_equal(c[0, 1], c[1, 0])
         nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[0, 3], c[3, 0])
         nose.tools.assert_equal(c[1, 2], c[2, 1])
+        nose.tools.assert_equal(c[1, 3], c[3, 1])
+        nose.tools.assert_equal(c[2, 3], c[3, 2])
 
     def test_get_oob(self):
         # 2x2 covariance mat
@@ -155,59 +184,78 @@ class TestVitalCovariance(unittest.TestCase):
         nose.tools.assert_raises(IndexError, c.__getitem__, (-1, 0))
 
     def test_set(self):
-        m = np.ndarray((3, 3))
-        # [[ 0 1 2 ]                      [[ 0 2 4 ]
-        #  [ 3 4 5 ]  -> should become ->  [ 2 4 6 ]
-        #  [ 6 7 8 ]]                      [ 4 6 8 ]]
-        m.reshape((9,))[:] = list(range(9))
-        c = Covar3d(m)
+        m = np.ndarray((4, 4))
+        # [[ 0  2  4  6  ]                [[ 0  5  10 15 ]
+        #  [ 8  10 12 14 ]  -> should ->   [ 5  10 15 20 ]
+        #  [ 16 18 20 22 ]                 [ 10 15 20 25 ]
+        #  [ 24 26 28 30 ]]                [ 15 20 25 30 ]]
+        m.reshape((16,))[:] = list(range(0, 32, 2))
+
+        c = Covar4d(m)
 
         # modify some locations
         c[0, 1] = 1
         c[2, 2] = 3
 
+        # Test matrix upper triangle locations
         nose.tools.assert_equal(c[0, 0], 0)
         nose.tools.assert_equal(c[0, 1], 1)
-        nose.tools.assert_equal(c[0, 2], 4)
-        nose.tools.assert_equal(c[1, 1], 4)
-        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[0, 2], 10)
+        nose.tools.assert_equal(c[0, 3], 15)
+        nose.tools.assert_equal(c[1, 1], 10)
+        nose.tools.assert_equal(c[1, 2], 15)
+        nose.tools.assert_equal(c[1, 3], 20)
         nose.tools.assert_equal(c[2, 2], 3)
+        nose.tools.assert_equal(c[2, 3], 25)
+        nose.tools.assert_equal(c[3, 3], 30)
+
         nose.tools.assert_equal(c[0, 1], c[1, 0])
         nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[0, 3], c[3, 0])
         nose.tools.assert_equal(c[1, 2], c[2, 1])
+        nose.tools.assert_equal(c[1, 3], c[3, 1])
+        nose.tools.assert_equal(c[2, 3], c[3, 2])
 
         # Set in upper triangle and see it reflect in lower
-        c[0, 2] = 10.1
-        nose.tools.assert_equal(c[2, 0], 10.1)
+        c[0, 2] = 42
+        nose.tools.assert_equal(c[2, 0], 42)
 
         # Change something in lower triangle and see it reflected in upper
-        c[2, 1] = 20.2
-        nose.tools.assert_equal(c[1, 2], 20.2)
+        c[2, 1] = 43
+        nose.tools.assert_equal(c[1, 2], 43)
 
         # FLOAT
-        c = Covar3f(m)
-
+        c = Covar4f(m)
         # modify some locations
         c[0, 1] = 1
         c[2, 2] = 3
 
+        # Test matrix upper triangle locations
         nose.tools.assert_equal(c[0, 0], 0)
         nose.tools.assert_equal(c[0, 1], 1)
-        nose.tools.assert_equal(c[0, 2], 4)
-        nose.tools.assert_equal(c[1, 1], 4)
-        nose.tools.assert_equal(c[1, 2], 6)
+        nose.tools.assert_equal(c[0, 2], 10)
+        nose.tools.assert_equal(c[0, 3], 15)
+        nose.tools.assert_equal(c[1, 1], 10)
+        nose.tools.assert_equal(c[1, 2], 15)
+        nose.tools.assert_equal(c[1, 3], 20)
         nose.tools.assert_equal(c[2, 2], 3)
+        nose.tools.assert_equal(c[2, 3], 25)
+        nose.tools.assert_equal(c[3, 3], 30)
+
         nose.tools.assert_equal(c[0, 1], c[1, 0])
         nose.tools.assert_equal(c[0, 2], c[2, 0])
+        nose.tools.assert_equal(c[0, 3], c[3, 0])
         nose.tools.assert_equal(c[1, 2], c[2, 1])
+        nose.tools.assert_equal(c[1, 3], c[3, 1])
+        nose.tools.assert_equal(c[2, 3], c[3, 2])
 
         # Set in upper triangle and see it reflect in lower
-        c[0, 2] = 10.1
-        nose.tools.assert_almost_equal(c[2, 0], 10.1, 6)
+        c[0, 2] = 42
+        nose.tools.assert_equal(c[2, 0], 42)
 
         # Change something in lower triangle and see it reflected in upper
-        c[2, 1] = 20.2
-        nose.tools.assert_almost_equal(c[1, 2], 20.2, 5)
+        c[2, 1] = 43
+        nose.tools.assert_equal(c[1, 2], 43)
 
     def test_set_oob(self):
         # 2x2 covariance mat
