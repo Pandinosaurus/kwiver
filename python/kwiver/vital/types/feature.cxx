@@ -30,9 +30,6 @@
 
 #include <vital/types/feature.h>
 
-#include <python/kwiver/vital/util/pybind11.h>
-
-
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 
@@ -67,7 +64,7 @@ void declare_feature( py::module &m, std::string const& typestr )
   {
     std::stringstream s;
     s << self;
-    return (s.str());
+    return s.str();
   })
 
   .def_property( "location",   &Class::get_loc,       &Class::set_loc )

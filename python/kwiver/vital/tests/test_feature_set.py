@@ -34,9 +34,22 @@ Tests for Python interface to vital::uid
 
 """
 
-from kwiver.vital.types import Feature, FeatureSet, SimpleFeatureSet
+from kwiver.vital.types import FeatureD, FeatureF, FeatureSet, SimpleFeatureSet
+from kwiver.vital.tests.helpers import no_call_pure_virtual_method
 
 import nose.tools as nt
+import numpy as np
+
+
+class ConcreteFeatureSet(FeatureSet):
+    def __init__(self):
+        FeatureSet.__init__(self)
+
+    def size(self):
+        return 100
+
+    def features(self):
+        return [FeatureD([1, 2], 3, 4, 5)]
 
 
 class TestVitalFeatureSet(object):
@@ -44,40 +57,47 @@ class TestVitalFeatureSet(object):
         FeatureSet()
 
     def test_bad_call_virtual_size(self):
-        fs = FeatureSet()
-        with nt.assert_raises_regexp(
-            RuntimeError, "Tried to call pure virtual function"
-        ):
-            fs.size()
+        no_call_pure_virtual_method(FeatureSet().size)
 
-    def test_bad_call_virtual_size(self):
-        fs = FeatureSet()
-        with nt.assert_raises_regexp(
-            RuntimeError, "Tried to call pure virtual function"
-        ):
-            fs.features()
+    def test_bad_call_virtual_features(self):
+        no_call_pure_virtual_method(FeatureSet().features)
 
-    # TODO: inherit from this class and implement methods
+    def test_overriden_size(self):
+        nt.assert_equals(ConcreteFeatureSet().size(), 100)
+
+    def test_overriden_features(self):
+        nt.assert_equals(ConcreteFeatureSet().features(), [FeatureD([1, 2], 3, 4, 5)])
 
 
 class TestVitalSimpleFeatureSet(object):
     def _create_features(self):
-        pass
+        return [
+            FeatureF(),
+            FeatureF([1, 1], 1, 2, 1),
+            FeatureD(),
+            FeatureD([1, 1], 1, 2, 1),
+        ]
 
     def test_new(self):
         SimpleFeatureSet()
-        # TODO
+        SimpleFeatureSet(self._create_features())
+
+    def _create_feature_sets(self):
+        return (SimpleFeatureSet(), SimpleFeatureSet(self._create_features()))
 
     def test_size(self):
-        sfs = SimpleFeatureSet()
+        empty, nonempty = self._create_feature_sets()
 
-        nt.assert_equals(sfs.size(), 0)
-
-        # TODO
+        nt.assert_equals(empty.size(), 0)
+        nt.assert_equals(nonempty.size(), 4)
 
     def test_features(self):
-        sfs = SimpleFeatureSet()
+        empty, nonempty = self._create_feature_sets()
 
-        nt.assert_equals(sfs.features(), [])
+        np.testing.assert_array_equal(empty.features(), [])
+        np.testing.assert_array_equal(nonempty.features(), self._create_features())
 
-        # TODO
+        # Test that elements can be modified using the features method, and are not copied
+        f = nonempty.features()[0]
+        f.scale += 1
+        nt.ok_(nonempty.features()[0] == f)
