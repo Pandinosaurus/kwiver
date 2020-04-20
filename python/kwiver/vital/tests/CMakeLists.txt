@@ -30,6 +30,7 @@ set(__testable_modnames
   test_object_track_set
   test_query_result
   test_rotation
+  test_point
   test_polygon
   test_similarity
   test_timestamp

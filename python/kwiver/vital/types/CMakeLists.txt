@@ -197,6 +197,12 @@ target_link_libraries(python-vital.types-landmark
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(point
+  vital/types
+  point.cxx)
+target_link_libraries(python-vital.types-point
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
 
 kwiver_add_python_library(polygon
   vital/types
@@ -307,6 +313,7 @@ if(NOT SKBUILD)
     homography
     iqr_feedback
     landmark
+    point
     polygon
     query_result
     rotation
