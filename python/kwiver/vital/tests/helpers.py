@@ -38,6 +38,7 @@ import math
 from six.moves import range
 
 import numpy as np
+import nose.tools as nt
 
 from kwiver.vital.types import (
     Camera,
@@ -241,3 +242,11 @@ def create_geo_poly(crs=geodesy.SRID.lat_lon_NAD83, pts=None):
         loc4 = np.array([-77.395808248573299, 38.12593882643528])
         pts = [loc1, loc2, loc3, loc4]
     return GeoPolygon(Polygon(pts), crs)
+
+# Makes sure that a pure virtual method cannot be called
+# TODO: currently this only works for methods accepting no arguments
+def no_call_pure_virtual_method(mthd):
+    with nt.assert_raises_regexp(
+                RuntimeError, "Tried to call pure virtual function",
+            ):
+                mthd()
