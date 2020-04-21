@@ -73,7 +73,7 @@ void declare_feature( py::module &m, std::string const& typestr )
   .def_property( "angle",      &Class::get_angle,     &Class::set_angle )
   .def_property( "covariance", &Class::get_covar,     &Class::set_covar )
   .def_property( "color",      &Class::get_color,     &Class::set_color )
-  .def_property_readonly( "type_name", [] (const Class& self)
+  .def_property_readonly( "type_name", [] ( const Class& self )
   {
     return self.data_type().name()[0];
   })
