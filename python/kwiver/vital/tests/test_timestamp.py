@@ -40,7 +40,7 @@ import nose.tools
 from kwiver.vital.types import Timestamp
 
 
-class TestRGBColor (unittest.TestCase):
+class TestTimestamp (unittest.TestCase):
 
   def test_new(self):
     Timestamp()
