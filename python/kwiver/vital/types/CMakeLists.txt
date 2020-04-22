@@ -197,6 +197,13 @@ target_link_libraries(python-vital.types-landmark
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(local_cartesian
+  vital/types
+  local_cartesian.cxx)
+target_link_libraries(python-vital.types-local_cartesian
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(point
   vital/types
   point.cxx)
@@ -313,6 +320,7 @@ if(NOT SKBUILD)
     homography
     iqr_feedback
     landmark
+    local_cartesian
     point
     polygon
     query_result

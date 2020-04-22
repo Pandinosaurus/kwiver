@@ -24,6 +24,7 @@ from kwiver.vital.types.geo_polygon import *
 from kwiver.vital.types.homography import *
 from kwiver.vital.types.iqr_feedback import *
 from kwiver.vital.types.landmark import *
+from kwiver.vital.types.local_cartesian import *
 from kwiver.vital.types.object_track_set import *
 from kwiver.vital.types.point import *
 from kwiver.vital.types.polygon import *

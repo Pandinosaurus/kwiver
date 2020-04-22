@@ -26,6 +26,7 @@ set(__testable_modnames
   test_image_container
   test_iqr_feedback
   test_landmark
+  test_local_cartesian
   test_object_track_state
   test_object_track_set
   test_query_result
