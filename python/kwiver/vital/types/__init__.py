@@ -19,6 +19,7 @@ from kwiver.vital.types.feature import *
 from kwiver.vital.types.feature_set import *
 from kwiver.vital.types.geodesy import *
 from kwiver.vital.types.geo_covariance import *
+from kwiver.vital.types.geo_MGRS import *
 from kwiver.vital.types.geo_point import *
 from kwiver.vital.types.geo_polygon import *
 from kwiver.vital.types.homography import *
