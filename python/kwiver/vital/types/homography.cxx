@@ -48,7 +48,7 @@ void declare_homogaphy( py::module &m, std::string const& typestr )
   using matrix_t = Eigen::Matrix< T, 3, 3>;
   const std::string pyclass_name = std::string( "Homography" ) + typestr;
 
-  py::class_< Class, std::shared_ptr< Class > >(m, pyclass_name.c_str())
+  py::class_< Class, std::shared_ptr< Class >, kv::homography >(m, pyclass_name.c_str())
   .def(py::init())
   .def(py::init< matrix_t const& >())
   .def_static("random", [] ()
@@ -70,6 +70,7 @@ void declare_homogaphy( py::module &m, std::string const& typestr )
 
 PYBIND11_MODULE(homography, m)
 {
+  py::class_< kv::homography, std::shared_ptr< kv::homography > >(m, "BaseHomography");
   declare_homogaphy< float  >(m, "F");
   declare_homogaphy< double >(m, "D");
 }

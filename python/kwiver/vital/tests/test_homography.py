@@ -46,6 +46,11 @@ from kwiver.vital.types.homography import *
 
 
 class TestHomography (unittest.TestCase):
+    def test_no_init_base(self):
+         with nose.tools.assert_raises_regexp(
+            TypeError, "kwiver.vital.types.homography.BaseHomography: No constructor defined!"
+        ):
+            BaseHomography()
 
     def test_ident_init(self):
         h_d = HomographyD()
