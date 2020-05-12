@@ -64,6 +64,13 @@ target_link_libraries(python-vital.types-camera_map
   PUBLIC ${PYTHON_LIBRARIES}
          vital)
 
+kwiver_add_python_library(category_hierarchy
+  vital/types
+  category_hierarchy.cxx)
+target_link_libraries(python-vital.types-category_hierarchy
+  PUBLIC ${PYTHON_LIBRARIES}
+         vital)
+
 kwiver_add_python_library(color
   vital/types
   color.cxx)
@@ -327,6 +334,7 @@ if(NOT SKBUILD)
   kwiver_create_python_init(vital/types
     types
     bounding_box
+    category_hierarchy
     camera
     camera_intrinsics
     camera_map
