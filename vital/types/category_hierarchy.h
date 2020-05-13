@@ -107,8 +107,7 @@ public:
    *
    * Destroy object, deallocating all utilized memory
    */
-  ~category_hierarchy();
-
+  ~category_hierarchy() = default;
 
   /**
    * @brief Add a new class ID
@@ -219,6 +218,20 @@ public:
   /**
    * @brief Load a hierarchy from a file
    *
+   * File format
+   *  '#' at the start of the line indicates a comment
+   * <class> <class-list> ... - second through last class are synonyms for the first
+   * <class> :parent=<p-class> <opt-class-list> - Class is a child of the
+   * parent p-class. Opt-class-list are synonyms for the first class.
+   *
+   * Or more formally specified:
+   *
+   * <class> <class-spec>
+   * <class-spec> ::= <class-spec> <parent-spec> |
+   *                  <class-spec> <class> |
+   *                  <empty>
+   * <parent-spec> ::= :parent=<class>
+   *
    * Throwns on invalid file.
    */
   void load_from_file( const std::string& filename );
@@ -254,7 +267,7 @@ private:
 };
 
 // typedef for a category_hierarchy shared pointer
-typedef std::shared_ptr< category_hierarchy > category_hierarchy_sptr;
+using  category_hierarchy_sptr = std::shared_ptr< category_hierarchy >;
 
 } }
 
