@@ -65,15 +65,36 @@ class TestVitalCategoryHierarchy(object):
         Ids are reversed to check the sorting function
         """
 
+    # Writes some lines to a tempfile to be read from.
+    # Tempfile is removed from system after being closed
     def _create_file(self):
+        # Creates a file that can construct the following hierarchy
+        #                class0
+        #                /   \
+        #               /     \
+        #          class1_0  class1_1
+        #            /      /
+        #           /      /
+        #          class2_0
+
+        # where class0   has id 0,
+        #       class1_0 has id 1,
+        #       class1_1 has id 2, and
+        #       class2_0 has id 3
+        # Each class has 2 synonyms, each of the form:
+        # {classname}_syn{syn_num}, where syn_num is 0 or 1
+
         fp = tempfile.NamedTemporaryFile(mode="w+t")
         fp.writelines(
-            """class1 class1_syn1, class1_syn2
-class2 :parent=class1 class2_syn1 class2_syn1
-
-class3 class3_syn1 class3_syn2 :parent=class1
-class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
-#class5"""
+            [
+                "class0",
+                "\nclass1"
+                # "class0 class0_syn1 class0_syn2",
+                # "\nclass1_0 :parent=class0 class1_0_syn0 class1_0_syn1",
+                # "\nclass1_1 class1_1_syn0 class1_1_syn1 :parent=class0",
+                # "\nclass2_0 class2_0_syn1 :parent=class1_0 :parent=class1_1 class2_0_syn2",
+                # "\n#class5",
+            ]
         )
         return fp
 
@@ -81,7 +102,14 @@ class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
         CategoryHierarchy()
 
     def test_construct_from_file(self):
-        pass
+        fp = self._create_file()
+        CategoryHierarchy(fp.name)
+
+    def test_constructor_from_file_no_exist(self):
+        expected_err_msg = "Unable to open nonexistant_file.txt"
+
+        with nt.assert_raises_regexp(RuntimeError, expected_err_msg):
+            CategoryHierarchy("nonexistant_file.txt")
 
     def test_construct_from_lists(self):
 
@@ -98,8 +126,10 @@ class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
         CategoryHierarchy(self.class_names, self.parent_names, self.ids)
 
     def _create_hierarchies(self):
+        fp = self._create_file()
+
         empty = CategoryHierarchy()
-        from_file = CategoryHierarchy()  # TODO use tempfile and write?
+        from_file = CategoryHierarchy(fp.name)
         from_lists = CategoryHierarchy(self.class_names, self.parent_names, self.ids)
 
         return (empty, from_file, from_lists)
@@ -147,6 +177,7 @@ class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
             #     from_file.has_class_name(name),
             #     "heirarchy constructed from lists does not have {}".format(name),
             # )
+            print(from_file.all_class_names())
 
             # from_lists
             nt.ok_(
@@ -158,7 +189,7 @@ class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
         nt.assert_equals(empty.all_class_names(), [])
         nt.assert_equals(empty.size(), 0)
 
-        # Tests for from_file TODO
+        # Tests for from_file todo
         # nt.assert_equals(from_file.all_class_names(), ["class0", "class1_0", "class1_1", "class2_0"])
         # nt.assert_equals(from_file.size(), len(self.class_names))
 
@@ -167,6 +198,14 @@ class4 class4_syn1 :parent=class2 :parent=class3 class4_syn2
             from_lists.all_class_names(), ["class2_0", "class1_1", "class1_0", "class0"]
         )
         nt.assert_equals(from_lists.size(), len(self.class_names))
+
+    # Only hierarchies constructed from files can be constructed with synonyms
+    def test_initial_synonyms(self):
+        fp = self._create_file()
+        ch = CategoryHierarchy(fp.name)
+
+        for cname in ch.all_class_names():
+            pass
 
     def test_initial_relationships(self):
         empty, from_file, from_lists = self._create_hierarchies()
