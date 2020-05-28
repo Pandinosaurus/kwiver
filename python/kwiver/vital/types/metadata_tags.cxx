@@ -41,11 +41,11 @@ namespace kv = kwiver::vital;
 .value( "VITAL_META_" #TAG, kv::vital_metadata_tag::VITAL_META_ ## TAG )
 
 
-PYBIND11_MODULE(metadata_tags, m)
+PYBIND11_MODULE( metadata_tags, m )
 {
-  py::enum_<kv::vital_metadata_tag>(m, "tags")
-    KWIVER_VITAL_METADATA_TAGS(REGISTER_TAG_ENUM)
-    .value("VITAL_META_LAST_TAG", kv::VITAL_META_LAST_TAG)
+  py::enum_< kv::vital_metadata_tag >( m, "tags" )
+    KWIVER_VITAL_METADATA_TAGS( REGISTER_TAG_ENUM )
+    .value( "VITAL_META_LAST_TAG", kv::VITAL_META_LAST_TAG )
   ;
 }
 
