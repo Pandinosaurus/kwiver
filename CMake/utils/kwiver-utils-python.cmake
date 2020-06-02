@@ -173,7 +173,7 @@ function (kwiver_add_python_module path     modpath    module)
   # install the configured binary to pypkg_install_path
   kwiver_install(
     FILES       "${pyfile_dst}"
-    DESTINATION "${pypkg_install_path}/${modpath}"
+    DESTINATION "${pypkg_install_path}"
     COMPONENT   runtime)
 
   add_dependencies(python
@@ -252,6 +252,6 @@ function (kwiver_create_python_init    modpath)
   endif()
   kwiver_install(
     FILES       "${init_path}"
-    DESTINATION "${install_path}/${modpath}"
+    DESTINATION "${install_path}"
     COMPONENT   runtime)
 endfunction ()
