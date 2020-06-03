@@ -45,25 +45,23 @@ using namespace kwiver::vital;
 
 #define REGISTER_TYPED_METADATA( TAG, NAME, T, ... ) \
   py::class_< typed_metadata< VITAL_META_ ## TAG, T >, \
-              std::shared_ptr< typed_metadata< VITAL_META_ ## TAG, T > >>( m, "typed_metadata_" #TAG ) \
+              std::shared_ptr< typed_metadata< VITAL_META_ ## TAG, T > >, \
+              metadata_item >( m, "TypedMetadata_" #TAG ) \
   .def( py::init( [] ( std::string name, T const& data ) \
   { \
     return typed_metadata< VITAL_META_ ## TAG, T >( name, any( data ) ); \
   })) \
-  .def( "type", [] ( typed_metadata< VITAL_META_ ## TAG, T > const& self ) \
+  .def_property_readonly( "data", [] ( typed_metadata< VITAL_META_ ## TAG, T > const& self ) \
   { \
-    return demangle( self.type().name() ); \
+    any dat = self.data(); \
+    return any_cast< T >( dat ); \
   }) \
-  .def( "as_string", &typed_metadata< VITAL_META_ ## TAG, T >::as_string ) \
-  .def_property_readonly( "data", [] ( typed_metadata< VITAL_META_ ## TAG, T > const& self ){
-    any //TODO: start here
-  })
   ;
 
 
 PYBIND11_MODULE( metadata, m )
 {
-  py::class_< metadata_item, std::shared_ptr< metadata_item >>( m, "metadata_item" )
+  py::class_< metadata_item, std::shared_ptr< metadata_item > >( m, "MetadataItem" )
   .def( "is_valid",    &metadata_item::is_valid )
   .def( "__nonzero__", [] ( metadata_item const& self )
   {
@@ -75,16 +73,19 @@ PYBIND11_MODULE( metadata, m )
   })
   .def_property_readonly( "name", &metadata_item::name )
   .def_property_readonly( "tag",  &metadata_item::tag )
+  // TODO: Get rid of this?
+  .def_property_readonly( "type", [] ( metadata_item const& self )
+  {
+    return demangle( self.type().name() );
+  })
   // NOTE: data() is put into the derived class.
   // Otherwise, we'd have to create a separate data() function for each type.
 
-  // TODO test this
-  .def( "type", &metadata_item::type )
   .def( "as_double",  &metadata_item::as_double )
   .def( "has_double", &metadata_item::has_double )
   .def( "as_uint64",  &metadata_item::as_uint64 )
   .def( "has_uint64", &metadata_item::has_uint64 )
-  .def( "__str__",    &metadata_item::as_string )
+  .def( "as_string",  &metadata_item::as_string )
   .def( "has_string", &metadata_item::has_string )
 
   // No print_value() since it is almost the same as as_string,
@@ -93,31 +94,39 @@ PYBIND11_MODULE( metadata, m )
   // so we'll just bind as_string.
   ;
 
-  // Now bind all of the typed_metadatas
+  // Now bind all of metadata_item subclasses
+  // First the "unknown" type
+  // TODO TELL LINUS IN HEADER
+  py::class_< unknown_metadata_item,
+              std::shared_ptr< unknown_metadata_item >,
+              metadata_item >( m, "UnknownMetadataItem" )
+  .def( py::init<>() )
+  .def_property_readonly( "data", [] ( unknown_metadata_item const& self )
+  {
+    any dat = self.data();
+    return any_cast< int >( dat ); //data is int 0
+  })
+  ;
+
+  // Now the typed subclasses (around 100 of them)
   KWIVER_VITAL_METADATA_TAGS( REGISTER_TYPED_METADATA )
 
-  // TODO: exceptions??
   // Now bind the actual metadata class
-  py::class_< metadata, std::shared_ptr< metadata > >( m, "metadata" )
-  // TODO
+  py::class_< metadata, std::shared_ptr< metadata > >( m, "Metadata" )
+  .def( py::init<>() )
+  // TODO: may have to change pointer argument
   // .def( "add" )
-  .def( "erase", &metadata::erase )
-  .def( "has", &metadata::has )
-  .def( "find", &metadata::find )
-  // TODO: test
-  .def( "__iter__", [] ( metadata& self )
-  {
-    return py::make_iterator(self.cbegin(), self.cend());
-  }, py::keep_alive<0, 1>())
-  .def( "size", &metadata::size )
-  .def( "empty", &metadata::empty )
+  .def( "erase",         &metadata::erase )
+  .def( "has",           &metadata::has )
+  .def( "find",          &metadata::find )
+  .def( "size",          &metadata::size )
+  .def( "empty",         &metadata::empty )
   .def( "set_timestamp", &metadata::set_timestamp )
-  .def( "timestamp", &metadata::timestamp )
+  .def( "timestamp",     &metadata::timestamp )
 
-  // TODO: test
   .def_static( "typeid_for_tag", [] ( metadata const& self, vital_metadata_tag tag )
   {
-    return demangle(self.typeid_for_tag( tag ).name());
+    return demangle( self.typeid_for_tag( tag ).name() );
   })
   .def_static( "format_string", &metadata::format_string )
   ;
