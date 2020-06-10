@@ -33,14 +33,15 @@
 
 #include <python/kwiver/vital/util/pybind11.h>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 
 #include <memory>
 
-namespace py=pybind11;
-namespace kv=kwiver::vital;
+namespace py = pybind11;
+namespace kv = kwiver::vital;
 
 
 class deletable_geo_conversion
@@ -56,7 +57,7 @@ class geo_conversion_trampoline
 {
 public:
   // Inheriting default constructor
-  // using deletable_geo_conversion::deletable_geo_conversion; //TODO: should this be here?
+  using deletable_geo_conversion::deletable_geo_conversion;
 
   // Override virtual functions
   char const* id() const override;
@@ -65,37 +66,43 @@ public:
   kv::vector_3d operator()( kv::vector_3d const& point, int from, int to ) override;
 };
 
-PYBIND11_MODULE(geodesy, m)
+PYBIND11_MODULE( geodesy, m )
 {
   // Define a submodule for the SRID namespace,
   // which contains identifier codes for different spatial reference systems
-  auto msri = m.def_submodule("SRID");
-  msri.attr("lat_lon_NAD83") = kv::SRID::lat_lon_NAD83;
-  msri.attr("lat_lon_WGS84") = kv::SRID::lat_lon_WGS84;
-  msri.attr("UPS_WGS84_north") = kv::SRID::UPS_WGS84_north;
-  msri.attr("UPS_WGS84_south") = kv::SRID::UPS_WGS84_south;
-  msri.attr("UTM_WGS84_north") = kv::SRID::UTM_WGS84_north;
-  msri.attr("UTM_WGS84_south") = kv::SRID::UTM_WGS84_south;
-  msri.attr("UTM_NAD83_northeast") = kv::SRID::UTM_NAD83_northeast;
-  msri.attr("UTM_NAD83_northwest") = kv::SRID::UTM_NAD83_northwest;
+  auto msri = m.def_submodule( "SRID" );
+  msri.attr( "lat_lon_NAD83" )       = kv::SRID::lat_lon_NAD83;
+  msri.attr( "lat_lon_WGS84" )       = kv::SRID::lat_lon_WGS84;
+  msri.attr( "UPS_WGS84_north" )     = kv::SRID::UPS_WGS84_north;
+  msri.attr( "UPS_WGS84_south" )     = kv::SRID::UPS_WGS84_south;
+  msri.attr( "UTM_WGS84_north" )     = kv::SRID::UTM_WGS84_north;
+  msri.attr( "UTM_WGS84_south" )     = kv::SRID::UTM_WGS84_south;
+  msri.attr( "UTM_NAD83_northeast" ) = kv::SRID::UTM_NAD83_northeast;
+  msri.attr( "UTM_NAD83_northwest" ) = kv::SRID::UTM_NAD83_northwest;
   ;
 
   // TODO: this class strucure compiles, but im not sure if it works. Needs testing
 
-  // py::class_<deletable_geo_conversion, geo_conversion_trampoline, std::shared_ptr<deletable_geo_conversion>>(m, "GeoConversion")
-  // .def("id", &deletable_geo_conversion::id)
-  // .def("describe", &deletable_geo_conversion::describe)
-  // .def("__call__", (kv::vector_2d (deletable_geo_conversion::*) (kv::vector_2d const&, int, int)) &deletable_geo_conversion::operator())
-  // .def("__call__", (kv::vector_3d (deletable_geo_conversion::*) (kv::vector_3d const&, int, int)) &deletable_geo_conversion::operator())
-  // ;
+  py::class_< deletable_geo_conversion,
+              geo_conversion_trampoline,
+              std::shared_ptr< deletable_geo_conversion > >( m, "GeoConversion" )
+  .def( py::init() ) // Need this for trampoline
+  .def( "id", &deletable_geo_conversion::id )
+  .def( "describe", &deletable_geo_conversion::describe )
+  .def( "__call__", ( kv::vector_2d ( deletable_geo_conversion::* ) ( kv::vector_2d const&, int, int )) &deletable_geo_conversion::operator() )
+  .def( "__call__", ( kv::vector_3d ( deletable_geo_conversion::* ) ( kv::vector_3d const&, int, int )) &deletable_geo_conversion::operator() )
+  ;
 
-  py::class_<kv::utm_ups_zone_t, std::shared_ptr<kv::utm_ups_zone_t>>(m, "UTMUPSZone")
-  .def(py::init<>())
-  .def(py::init<int, bool>())
-  .def_readwrite("number", &kv::utm_ups_zone_t::number)
-  .def_readwrite("north", &kv::utm_ups_zone_t::north)
+  py::class_< kv::utm_ups_zone_t, std::shared_ptr< kv::utm_ups_zone_t > >( m, "UTMUPSZone" )
+  .def( py::init<>() )
+  .def( py::init< int, bool >() )
+  .def_readwrite( "number", &kv::utm_ups_zone_t::number )
+  .def_readwrite( "north",  &kv::utm_ups_zone_t::north )
   ;
 }
+
+
+// TODO geo_conv fxns
 
 
 char const*
