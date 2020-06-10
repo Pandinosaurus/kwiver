@@ -54,33 +54,52 @@ class TestVitalLocalCartesian(object):
         self.geo2 = GeoPoint(np.array([-73.75623008, 42.89913984, 52.381]), self.wgs)
 
     def test_create(self):
-        LocalCartesian(self.origA)
+        LocalCartesian(self.origA, 0)
         LocalCartesian(self.origA, 33)
 
     def test_initial_origin(self):
-        lc = LocalCartesian(self.origA)
+        lc = LocalCartesian(self.origA, 0)
         np.testing.assert_array_almost_equal(lc.get_origin().location(), self.origA.location())
 
         lc = LocalCartesian(self.origA, 33)
         np.testing.assert_array_almost_equal(lc.get_origin().location(), self.origA.location())
 
     def test_initial_orientation(self):
-        lc = LocalCartesian(self.origA)
+        lc = LocalCartesian(self.origA, 0)
         nt.assert_equal(lc.get_orientation(), 0)
 
         lc = LocalCartesian(self.origA, 33)
         nt.assert_equal(lc.get_orientation(), 33)
 
+    def check_origin_and_orient_equal(self, lc, origin, orient):
+        np.testing.assert_array_almost_equal(lc.get_origin().location(), origin.location())
+        nt.assert_equal(lc.get_orientation(), orient)
+
     def test_api(self):
-        lc = LocalCartesian(self.origA)
+        lc = LocalCartesian(self.origA, 0)
 
         lc.set_origin(self.geo1, 33)
-        np.testing.assert_array_almost_equal(lc.get_origin().location(), self.geo1.location())
-        nt.assert_equal(lc.get_orientation(), 33)
+        self.check_origin_and_orient_equal(lc, self.geo1, 33)
 
         lc.set_origin(self.geo2, 22)
-        np.testing.assert_array_almost_equal(lc.get_origin().location(), self.geo2.location())
-        nt.assert_equal(lc.get_orientation(), 22)
+        self.check_origin_and_orient_equal(lc, self.geo2, 22)
+
+    def test_default_args(self):
+        # Default value of orientation arg = 0
+        lc = LocalCartesian(self.origA)
+        self.check_origin_and_orient_equal(lc, self.origA, 0)
+
+        # Test calling set_origin with named parameters
+        lc.set_origin(orientation=33, origin=self.geo1)
+        self.check_origin_and_orient_equal(lc, self.geo1, 33)
+
+        # Now test named parameters of constructors
+        lc = LocalCartesian(orientation=33, origin=self.origA)
+        self.check_origin_and_orient_equal(lc, self.origA, 33)
+
+        # Then default value of orientation argument for set_origin
+        lc.set_origin(self.geo1)
+        self.check_origin_and_orient_equal(lc, self.geo1, 0)
 
     def compare_lla(self, gp1, gp2):
         np.testing.assert_almost_equal(gp1[0], gp2[0], 7)

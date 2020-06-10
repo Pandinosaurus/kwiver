@@ -41,10 +41,10 @@ namespace kv=kwiver::vital;
 // Instead, call convert_to_cartesian on the C++ side and return the result,
 // instead of modifying by reference.
 kv::vector_3d
-local_cartesian_convert_to_cartesian(kv::local_cartesian const& self, kv::geo_point const& loc)
+local_cartesian_convert_to_cartesian( kv::local_cartesian const& self, kv::geo_point const& loc )
 {
   kv::vector_3d cart_out;
-  self.convert_to_cartesian(loc, cart_out);
+  self.convert_to_cartesian( loc, cart_out );
   return cart_out;
 }
 
@@ -53,7 +53,7 @@ PYBIND11_MODULE(local_cartesian, m)
 {
   py::class_< kwiver::vital::local_cartesian, std::shared_ptr< kwiver::vital::local_cartesian > >( m, "LocalCartesian" )
   .def( py::init< kv::geo_point const&, double >(), py::arg("origin"), py::arg("orientation") = 0 )
-  .def( "set_origin", &kv::local_cartesian::set_origin )
+  .def( "set_origin", &kv::local_cartesian::set_origin, py::arg("origin"), py::arg("orientation") = 0 )
   .def( "get_origin", &kv::local_cartesian::get_origin )
   .def( "get_orientation", &kv::local_cartesian::get_orientation )
   // Convert_from_cartesian does not need to be wrapped.
