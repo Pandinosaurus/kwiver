@@ -43,6 +43,8 @@
 namespace py = pybind11;
 using namespace kwiver::vital;
 
+  // TODO 
+  //.def_property( "type" )
 #define REGISTER_TYPED_METADATA( TAG, NAME, T, ... ) \
   py::class_< typed_metadata< VITAL_META_ ## TAG, T >, \
               std::shared_ptr< typed_metadata< VITAL_META_ ## TAG, T > >, \
@@ -56,6 +58,16 @@ using namespace kwiver::vital;
     any dat = self.data(); \
     return any_cast< T >( dat ); \
   }) \
+  .def( "as_string", [] ( typed_metadata< VITAL_META_ ## TAG, T > const& self ) \
+  { \
+    std::string ret = self.as_string(); \
+\
+    if ( typeid( T ) == typeid( bool ) ) \
+    { \
+      return ( ret == std::string( "1" ) ? std::string( "True" ) : std::string( "False" ) ); \
+    } \
+    return ret; \
+  }) \
   ;
 
 
@@ -63,14 +75,8 @@ PYBIND11_MODULE( metadata, m )
 {
   py::class_< metadata_item, std::shared_ptr< metadata_item > >( m, "MetadataItem" )
   .def( "is_valid",    &metadata_item::is_valid )
-  .def( "__nonzero__", [] ( metadata_item const& self )
-  {
-    return bool(self);
-  })
-  .def( "__bool__",    [] ( metadata_item const& self )
-  {
-    return bool(self);
-  })
+  .def( "__nonzero__", &metadata_item::is_valid )
+  .def( "__bool__",    &metadata_item::is_valid )
   .def_property_readonly( "name", &metadata_item::name )
   .def_property_readonly( "tag",  &metadata_item::tag )
   // TODO: Get rid of this?
@@ -101,11 +107,23 @@ PYBIND11_MODULE( metadata, m )
               std::shared_ptr< unknown_metadata_item >,
               metadata_item >( m, "UnknownMetadataItem" )
   .def( py::init<>() )
+  .def( "is_valid",    &unknown_metadata_item::is_valid )
+  .def( "__nonzero__", &unknown_metadata_item::is_valid )
+  .def( "__bool__",    &unknown_metadata_item::is_valid )
+  .def_property_readonly( "tag",  &unknown_metadata_item::tag )
+  // TODO: Get rid of this?
+  .def_property_readonly( "type", [] ( unknown_metadata_item const& self )
+  {
+    return demangle( self.type().name() );
+  })
   .def_property_readonly( "data", [] ( unknown_metadata_item const& self )
   {
     any dat = self.data();
     return any_cast< int >( dat ); //data is int 0
   })
+  .def( "as_string",  &unknown_metadata_item::as_string )
+  .def( "as_double",  &unknown_metadata_item::as_double )
+  .def( "as_uint64",  &unknown_metadata_item::as_uint64 )
   ;
 
   // Now the typed subclasses (around 100 of them)
@@ -115,7 +133,7 @@ PYBIND11_MODULE( metadata, m )
   py::class_< metadata, std::shared_ptr< metadata > >( m, "Metadata" )
   .def( py::init<>() )
   // TODO: may have to change pointer argument
-  // .def( "add" )
+  // .def( "add",           &metadata::add)
   .def( "erase",         &metadata::erase )
   .def( "has",           &metadata::has )
   .def( "find",          &metadata::find )
