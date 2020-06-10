@@ -244,9 +244,8 @@ def create_geo_poly(crs=geodesy.SRID.lat_lon_NAD83, pts=None):
     return GeoPolygon(Polygon(pts), crs)
 
 # Makes sure that a pure virtual method cannot be called
-# TODO: currently this only works for methods accepting no arguments
-def no_call_pure_virtual_method(mthd):
+def no_call_pure_virtual_method(mthd, *args, **kwargs):
     with nt.assert_raises_regexp(
                 RuntimeError, "Tried to call pure virtual function",
             ):
-                mthd()
+                mthd(*args, **kwargs)
