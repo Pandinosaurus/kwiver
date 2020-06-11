@@ -34,50 +34,26 @@
 
 # """
 from kwiver.vital.types import geodesy as g
-from kwiver.vital.tests.helpers import no_call_pure_virtual_method
+import nose.tools as nt
 
 from multimethod import multimethod
-import nose.tools as nt
 import numpy as np
 
-class SimpleGeoConversion(g.GeoConversion):
-    def __init__(self):
-        g.GeoConversion.__init__(self)
-
-    def id(self):
-        return "5"
-
-    def describe(self, crs):
-        return {"first_key": "first_val"}
-
-    # TODO
-    def __call__(self, point, from_crs, to_crs):
-        return np.array([from_crs, to_crs])
+# TODO: constructor?
+# class SimpleGeoConversion(g.GeoConversion):
+#     def __init__(self):
 
 
-class TestVitalGeoConversion(object):
+#     def id(self):
+#         return "5"
 
-    # TODO: when geo_conversion bindings are finished, uncomment below
-    def test_no_call_pure_virtual_methods(self):
-        gc = g.GeoConversion()
-        crs1 = g.SRID.lat_lon_NAD83
-        crs2 = g.SRID.UPS_WGS84_north
-        point_2d = np.array([1, 2])
-        point_3d = np.array([3, 2, 1])
-        no_call_pure_virtual_method(gc.id)
-        no_call_pure_virtual_method(gc.describe, crs1)
-        no_call_pure_virtual_method(gc.__call__, point_2d, crs1, crs2)
-        no_call_pure_virtual_method(gc.__call__, point_3d, crs1, crs2)
+#     def describe(self, crs):
+#         pass
 
-    def test_init_concrete(self):
-        SimpleGeoConversion()
+#     # TODO
+#     def __call__(self, point, from_crs: int, to_crs: int):
+#         return np.array([from_crs, to_crs])
 
-
-    """ TODO: Things that should be tested:
-            char* in id()
-            inheriting without overriding?
-            no seg faults
-    """
 
 class TestVitalGeodesy(object):
     def test_srid(self):
@@ -134,3 +110,19 @@ class TestVitalGeodesy(object):
 
 
 
+    # TODO: when geo_conversion bindings are finished, uncomment below
+    # def test_geo_conversion_no_construct(self):
+    #     with nt.assert_raises_regexp(
+    #         TypeError,
+    #         "kwiver.vital.types.geodesy.GeoConversion: No constructor defined!",
+    #     ):
+    #         g.GeoConversion()
+
+    """ Things that should be tested:
+            char* in id()
+            inheriting without overriding?
+            no seg faults
+    """
+    # TODO
+    # def test_init_concrete(self):
+    #     SimpleGeoConversion()
