@@ -39,7 +39,7 @@ import nose.tools as nt
 from multimethod import multimethod
 import numpy as np
 
-# TODO: constructor?
+# TODO: See TODO in binding code
 # class SimpleGeoConversion(g.GeoConversion):
 #     def __init__(self):
 
@@ -111,6 +111,7 @@ class TestVitalGeodesy(object):
 
 
     # TODO: when geo_conversion bindings are finished, uncomment below
+    # TODO: See TODO in binding code
     # def test_geo_conversion_no_construct(self):
     #     with nt.assert_raises_regexp(
     #         TypeError,

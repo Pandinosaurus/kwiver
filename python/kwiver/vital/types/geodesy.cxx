@@ -42,28 +42,28 @@
 namespace py=pybind11;
 namespace kv=kwiver::vital;
 
+// TODO: See TODO in PYBIND11_MODULE call
+// class deletable_geo_conversion
+//   : public kv::geo_conversion
+// {
+// public:
+//   ~deletable_geo_conversion() override = default;
+// };
 
-class deletable_geo_conversion
-  : public kv::geo_conversion
-{
-public:
-  ~deletable_geo_conversion() override = default;
-};
 
-
-class geo_conversion_trampoline
-  : public deletable_geo_conversion
-{
-public:
+// class geo_conversion_trampoline
+//   : public deletable_geo_conversion
+// {
+// public:
   // Inheriting default constructor
   // using deletable_geo_conversion::deletable_geo_conversion; //TODO: should this be here?
 
   // Override virtual functions
-  char const* id() const override;
-  kv::geo_crs_description_t describe( int crs ) override;
-  kv::vector_2d operator()( kv::vector_2d const& point, int from, int to ) override;
-  kv::vector_3d operator()( kv::vector_3d const& point, int from, int to ) override;
-};
+//   char const* id() const override;
+//   kv::geo_crs_description_t describe( int crs ) override;
+//   kv::vector_2d operator()( kv::vector_2d const& point, int from, int to ) override;
+//   kv::vector_3d operator()( kv::vector_3d const& point, int from, int to ) override;
+// };
 
 PYBIND11_MODULE(geodesy, m)
 {
@@ -80,7 +80,13 @@ PYBIND11_MODULE(geodesy, m)
   msri.attr("UTM_NAD83_northwest") = kv::SRID::UTM_NAD83_northwest;
   ;
 
-  // TODO: this class strucure compiles, but im not sure if it works. Needs testing
+  // TODO: The protected virtual destructor in geo_conversion causes a lot of problems. Without
+  // the deleteable_geo_conversion class, compiler errors are thrown because Pybind won't
+  // be able to delete any instances. Using py::nodelete forces us to use a unique_ptr, which
+  // won't work with the definitions of get_geo_conv and set_geo_conv. Plus, we need a ctor in the
+  // base class so that the trampoline will work, and using py::nodelete will give memory leaks.
+  // For now, all code related to binding this class has been commented out. When a solution is found,
+  // it will be uncommented.
 
   // py::class_<deletable_geo_conversion, geo_conversion_trampoline, std::shared_ptr<deletable_geo_conversion>>(m, "GeoConversion")
   // .def("id", &deletable_geo_conversion::id)
@@ -97,58 +103,58 @@ PYBIND11_MODULE(geodesy, m)
   ;
 }
 
+// TODO: See TODO in PYBIND11_MODULE call
+// char const*
+// geo_conversion_trampoline
+// ::id() const
+// {
+//   VITAL_PYBIND11_OVERLOAD_PURE(
+//     char const*,
+//     kv::geo_conversion,
+//     id,
+//   );
+// }
 
-char const*
-geo_conversion_trampoline
-::id() const
-{
-  VITAL_PYBIND11_OVERLOAD_PURE(
-    char const*,
-    kv::geo_conversion,
-    id,
-  );
-}
+// kv::geo_crs_description_t
+// geo_conversion_trampoline
+// ::describe( int crs )
+// {
+//   VITAL_PYBIND11_OVERLOAD_PURE(
+//     kv::geo_crs_description_t,
+//     kv::geo_conversion,
+//     describe,
+//     crs
+//   );
+// }
 
-kv::geo_crs_description_t
-geo_conversion_trampoline
-::describe( int crs )
-{
-  VITAL_PYBIND11_OVERLOAD_PURE(
-    kv::geo_crs_description_t,
-    kv::geo_conversion,
-    describe,
-    crs
-  );
-}
+// kv::vector_2d
+// geo_conversion_trampoline
+// ::operator()
+// ( kv::vector_2d const& point, int from_crs, int to_crs )
+// {
+//   VITAL_PYBIND11_OVERLOAD_PURE_NAME(
+//     kv::vector_2d,
+//     kv::geo_conversion,
+//     "__call__",
+//     operator(),
+//     point,
+//     from_crs,
+//     to_crs
+//   );
+// }
 
-kv::vector_2d
-geo_conversion_trampoline
-::operator()
-( kv::vector_2d const& point, int from_crs, int to_crs )
-{
-  VITAL_PYBIND11_OVERLOAD_PURE_NAME(
-    kv::vector_2d,
-    kv::geo_conversion,
-    "__call__",
-    operator(),
-    point,
-    from_crs,
-    to_crs
-  );
-}
-
-kv::vector_3d
-geo_conversion_trampoline
-::operator()
-( kv::vector_3d const& point, int from_crs, int to_crs )
-{
-  VITAL_PYBIND11_OVERLOAD_PURE_NAME(
-    kv::vector_3d,
-    kv::geo_conversion,
-    "__call__",
-    operator(),
-    point,
-    from_crs,
-    to_crs
-  );
-}
+// kv::vector_3d
+// geo_conversion_trampoline
+// ::operator()
+// ( kv::vector_3d const& point, int from_crs, int to_crs )
+// {
+//   VITAL_PYBIND11_OVERLOAD_PURE_NAME(
+//     kv::vector_3d,
+//     kv::geo_conversion,
+//     "__call__",
+//     operator(),
+//     point,
+//     from_crs,
+//     to_crs
+//   );
+// }
