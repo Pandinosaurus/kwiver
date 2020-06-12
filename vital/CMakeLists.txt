@@ -97,6 +97,7 @@ set( vital_public_headers
   types/camera_rpc.h
   types/category_hierarchy.h
   types/color.h
+  types/context.h
   types/covariance.h
   types/database_query.h
   types/descriptor.h
@@ -142,6 +143,7 @@ set( vital_public_headers
   types/query_result_set.h
   types/rotation.h
   types/sfm_constraints.h
+  types/signal.h
   types/similarity.h
   types/timestamp.h
   types/timestamp_config.h
@@ -173,6 +175,7 @@ set( vital_sources
   types/camera_perspective.cxx
   types/camera_rpc.cxx
   types/category_hierarchy.cxx
+  types/context.cxx
   types/database_query.cxx
   types/descriptor.cxx
   types/descriptor_request.cxx
